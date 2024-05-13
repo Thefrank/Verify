@@ -1,4 +1,4 @@
-﻿namespace VerifyTests;
+namespace VerifyTests;
 
 public class Namer
 {
@@ -176,6 +176,11 @@ public class Namer
         if (OperatingSystem.IsAndroid())
         {
             return "Android";
+        }
+
+        if (OperatingSystem.IsFreeBSD())
+        {
+            return "FreeBSD";
         }
 
         if (OperatingSystem.IsIOS())

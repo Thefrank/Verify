@@ -16,15 +16,24 @@ dotnet add package Verify.Fixie
 include: implicit-usings
 
 
-## Source Control
+## Conventions
 
-### Includes/Excludes
+
+### Source Control Includes/Excludes
 
 include: include-exclude
+
 
 ### Text file settings
 
 include: text-file-settings
+
+
+### Conventions check
+
+Conventions can be checked by calling `VerifyChecks.Run()` in a test
+
+snippet: VerifyChecksFixie
 
 
 ## Rider Plugin
@@ -37,6 +46,10 @@ This is optional, but recommended.
 
 include: rider-resharper-orphaned-process
 
+
+## Treat "return value of pure method is not used" as error
+
+include: pure
 ## DiffPlex
 
 The text comparison behavior of Verify is pluggable. The default behaviour, on failure, is to output both the received
@@ -76,6 +89,9 @@ dotnet tool install -g verify.tool
 ## Sample Test
 
 snippet: SampleTestFixie
+
+
+include: fixie-convention
 
 ## Diff Tool
 

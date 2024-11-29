@@ -7,7 +7,6 @@
 Add the following packages to the test project:
 
 ```
-dotnet add package Microsoft.NET.Test.Sdk
 dotnet add package YoloDev.Expecto.TestSdk
 dotnet add package Expecto
 dotnet add package Verify.Expecto
@@ -18,15 +17,24 @@ dotnet add package Verify.Expecto
 include: implicit-usings
 
 
-## Source Control
+## Conventions
 
-### Includes/Excludes
+
+### Source Control Includes/Excludes
 
 include: include-exclude
+
 
 ### Text file settings
 
 include: text-file-settings
+
+
+### Conventions check
+
+Conventions can be checked by calling `VerifyChecks.Run()` in a test
+
+snippet: VerifyChecksExpecto
 
 ## DiffPlex
 

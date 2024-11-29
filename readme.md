@@ -11,10 +11,12 @@ To change this file edit the source file and then run MarkdownSnippets.
 [![Build status](https://ci.appveyor.com/api/projects/status/dpqylic0be7s9vnm/branch/main?svg=true)](https://ci.appveyor.com/project/SimonCropp/Verify)
 [![NuGet Status](https://img.shields.io/nuget/v/Verify.NUnit.svg?label=Verify.NUnit)](https://www.nuget.org/packages/Verify.NUnit/)
 [![NuGet Status](https://img.shields.io/nuget/v/Verify.Xunit.svg?label=Verify.Xunit)](https://www.nuget.org/packages/Verify.Xunit/)
+[![NuGet Status](https://img.shields.io/nuget/v/Verify.XunitV3.svg?label=Verify.XunitV3)](https://www.nuget.org/packages/Verify.XunitV3/)
 [![NuGet Status](https://img.shields.io/nuget/v/Verify.Fixie.svg?label=Verify.Fixie)](https://www.nuget.org/packages/Verify.Fixie/)
 [![NuGet Status](https://img.shields.io/nuget/v/Verify.Expecto.svg?label=Verify.Expecto)](https://www.nuget.org/packages/Verify.Expecto/)
 [![NuGet Status](https://img.shields.io/nuget/v/Verify.MSTest.svg?label=Verify.MSTest)](https://www.nuget.org/packages/Verify.MSTest/)
-[![NuGet Status](https://img.shields.io/nuget/v/Verify.MSTest.svg?label=Verify.ClipboardAccept)](https://www.nuget.org/packages/Verify.ClipboardAccept/)
+[![NuGet Status](https://img.shields.io/nuget/v/Verify.TUnit.svg?label=Verify.TUnit)](https://www.nuget.org/packages/Verify.TUnit/)
+[![NuGet Status](https://img.shields.io/nuget/v/Verify.ClipboardAccept.svg?label=Verify.ClipboardAccept)](https://www.nuget.org/packages/Verify.ClipboardAccept/)
 
 Verify is a snapshot tool that simplifies the assertion of complex data models and documents.
 
@@ -26,12 +28,10 @@ updated to the new result.
 **See [Milestones](../../milestones?state=closed) for release notes.**
 
 
-## Sponsors
+## Requirements
 
-A HUGE Thank-You to [AWS](https://github.com/aws) for sponsoring this project in September 2023 as part of
-the [AWS Open Source Software Fund](https://github.com/aws/dotnet-foss).
-
-Thanks to [DataDog](https://github.com/DataDog) for the generous monthly sponsorship.
+ * Supported runtimes: net472, net48, net481, net6, net8, and net9.
+ * Supported SDK: 8.0.300 and up
 
 
 ## [Getting started wizard](/docs/wiz/readme.md)
@@ -45,9 +45,11 @@ Get customized instructions for the specific combination of Operating System, ID
 
 * https://nuget.org/packages/Verify.NUnit/
 * https://nuget.org/packages/Verify.Xunit/
+* https://nuget.org/packages/Verify.XunitV3/
 * https://nuget.org/packages/Verify.Fixie/
 * https://nuget.org/packages/Verify.Expecto/
 * https://nuget.org/packages/Verify.MSTest/
+* https://nuget.org/packages/Verify.TUnit/
 
 
 ## Snapshot management
@@ -56,8 +58,8 @@ Accepting or declining a snapshot file is part of the core workflow of Verify. T
 approach(s) selected is a personal preference.
 
 * In the Windows Tray via [DiffEngineTray](https://github.com/VerifyTests/DiffEngine/blob/main/docs/tray.md)
-* [ReSharper test runner support](https://plugins.jetbrains.com/plugin/17241-verify-support) ([Source](https://github.com/matkoch/resharper-verify))
-* [Rider test runner support](https://plugins.jetbrains.com/plugin/17240-verify-support) ([Source](https://github.com/matkoch/resharper-verify))
+* [ReSharper test runner plugin](https://plugins.jetbrains.com/plugin/17241-verify-support) ([Source](https://github.com/matkoch/resharper-verify))
+* [Rider test runner plugin](https://plugins.jetbrains.com/plugin/17240-verify-support) ([Source](https://github.com/matkoch/resharper-verify))
 * [Via the clipboard](/docs/clipboard.md).
 * Manually making the change in the [launched diff tool](https://github.com/VerifyTests/DiffEngine#supported-tools).
   Either with a copy paste, or some tools have commands to automate this via a shortcut or a button.
@@ -157,6 +159,27 @@ public class Sample
 <!-- endSnippet -->
 
 
+### xUnitV3
+
+Support for [xUnitV3](https://xunit.net/)
+
+<!-- snippet: SampleTestXunitV3 -->
+<a id='snippet-SampleTestXunitV3'></a>
+```cs
+public class Sample
+{
+    [Fact]
+    public Task Test()
+    {
+        var person = ClassBeingTested.FindPerson();
+        return Verify(person);
+    }
+}
+```
+<sup><a href='/src/Verify.XunitV3.Tests/Snippets/Sample.cs#L1-L13' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestXunitV3' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
 ### Fixie
 
 Support for [Fixie](http://fixie.github.io/)
@@ -176,6 +199,64 @@ public class Sample
 <sup><a href='/src/Verify.Fixie.Tests/Snippets/Sample.cs#L1-L12' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestFixie' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
+Fixie is less opinionated than other test frameworks. As such it leaves up to the consumer how to configure test execution.<!-- include: fixie-convention. path: /docs/mdsource/fixie-convention.include.md -->
+
+To enable Verify  the [ITestProject and IExecution interfaces](https://github.com/fixie/fixie/wiki/Customizing-the-Test-Project-Lifecycle#the-default-convention) need to be used.
+
+Requirements:
+
+ * Assign the target assembly in `ITestProject.Configure` using `VerifierSettings.AssignTargetAssembly`
+ * Wrap test executions in `IExecution.Run` using `ExecutionState.Set`
+
+An example implementation of the above:
+
+<!-- snippet: TestProject.cs -->
+<a id='snippet-TestProject.cs'></a>
+```cs
+public class TestProject :
+    ITestProject,
+    IExecution
+{
+    public void Configure(TestConfiguration configuration, TestEnvironment environment)
+    {
+        VerifierSettings.AssignTargetAssembly(environment.Assembly);
+        configuration.Conventions.Add<DefaultDiscovery, TestProject>();
+    }
+
+    public async Task Run(TestSuite testSuite)
+    {
+        foreach (var testClass in testSuite.TestClasses)
+        {
+            foreach (var test in testClass.Tests)
+            {
+                if (test.HasParameters)
+                {
+                    foreach (var parameters in test
+                                 .GetAll<TestCase>()
+                                 .Select(_ => _.Parameters))
+                    {
+                        using (ExecutionState.Set(testClass, test, parameters))
+                        {
+                            await test.Run(parameters);
+                        }
+                    }
+                }
+                else
+                {
+                    using (ExecutionState.Set(testClass, test, null))
+                    {
+                        await test.Run();
+                    }
+                }
+            }
+        }
+    }
+}
+```
+<sup><a href='/src/Verify.Fixie.Tests/FixieSetup/TestProject.cs#L1-L39' title='Snippet source file'>snippet source</a> | <a href='#snippet-TestProject.cs' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+<!-- endInclude -->
+
 
 ### Expecto
 
@@ -192,7 +273,7 @@ open VerifyExpecto
 let tests =
     testTask "findPerson" {
         let person = ClassBeingTested.FindPerson()
-        do! Verifier.Verify("findPerson", person)
+        do! Verifier.Verify("findPerson", person).ToTask()
     }
 ```
 <sup><a href='/src/Verify.Expecto.FSharpTests/Tests.fs#L2-L13' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestExpecto' title='Start of snippet'>anchor</a></sup>
@@ -206,6 +287,28 @@ Due to the nature of the Expecto implementation, the following APIs in Verify ar
 * `settings.UseParameters()`
 * `settings.UseTextForParameters()`
 
+
+### TUnit
+
+Support for [TUnit](https://github.com/thomhurst/TUnit)
+
+<!-- snippet: SampleTestTUnit -->
+<a id='snippet-SampleTestTUnit'></a>
+```cs
+public class Sample
+{
+    [Test]
+    public Task Test()
+    {
+        var person = ClassBeingTested.FindPerson();
+        return Verify(person);
+    }
+}
+```
+<sup><a href='/src/Verify.TUnit.Tests/Snippets/Sample.cs#L1-L13' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestTUnit' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
 ### MSTest
 
 Support for [MSTest](https://github.com/Microsoft/testfx-docs)
@@ -214,8 +317,7 @@ Support for [MSTest](https://github.com/Microsoft/testfx-docs)
 <a id='snippet-SampleTestMSTest'></a>
 ```cs
 [TestClass]
-public class Sample :
-    VerifyBase
+public partial class Sample
 {
     [TestMethod]
     public Task Test()
@@ -225,8 +327,45 @@ public class Sample :
     }
 }
 ```
-<sup><a href='/src/Verify.MSTest.Tests/Snippets/Sample.cs#L3-L17' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestMSTest' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.MSTest.Tests/Snippets/Sample.cs#L1-L14' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestMSTest' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
+
+
+#### Marking tests as 'Using Verify'
+
+The MSTest implementation leverages a [Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) and requires test classes to opt in to being processed by the Source Generator.<!-- include: mstest-marker. path: /docs/mdsource/mstest-marker.include.md -->
+
+Add the `UsesVerifyAttribute`.
+
+For all test classes in an assembly:
+
+```
+[assembly: UsesVerify]
+```
+
+For a specific a test class:
+
+```
+[UsesVerify]
+```
+
+Or inherit from `VerifyBase`:
+
+<!-- snippet: VerifyBaseUsage.cs -->
+<a id='snippet-VerifyBaseUsage.cs'></a>
+```cs
+[TestClass]
+public class VerifyBaseUsage :
+    VerifyBase
+{
+    [TestMethod]
+    public Task Simple() =>
+        Verify("The content");
+}
+```
+<sup><a href='/src/Verify.MSTest.Tests/VerifyBaseUsage.cs#L1-L8' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyBaseUsage.cs' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+<!-- endInclude -->
 
 
 ### Initial Verification
@@ -376,7 +515,7 @@ await Verify(
         Bars = await repo.GetBars(id)
     });
 ```
-<sup><a href='/src/Verify.Tests/Snippets/Snippets.cs#L174-L183' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFuncOfTaskOfT' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Snippets/Snippets.cs#L157-L166' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFuncOfTaskOfT' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -432,10 +571,10 @@ Results in a .txt file:
 <!-- endSnippet -->
 
 
-## Source control: Received and Verified files
+## Conventions
 
 
-### Includes/Excludes
+### Source control Includes/Excludes
 
  * **All `*.received.*` files should be excluded from source control.**<!-- include: include-exclude. path: /docs/mdsource/include-exclude.include.md -->
 
@@ -453,7 +592,7 @@ If using [UseSplitModeForUniqueDirectory](/docs/naming.md#usesplitmodeforuniqued
 All `*.verified.*` files should be committed to source control.<!-- endInclude -->
 
 
-## Text file settings
+### Text file settings
 
 Text variants of verified and received have the following characteristics:<!-- include: text-file-settings. path: /docs/mdsource/text-file-settings.include.md -->
 
@@ -464,7 +603,7 @@ Text variants of verified and received have the following characteristics:<!-- i
 This manifests in several ways:
 
 
-**Source control settings**
+#### Source control settings
 
 All text extensions of `*.verified.*` should have:
 
@@ -479,13 +618,14 @@ eg add the following to `.gitattributes`
 *.verified.json text eol=lf working-tree-encoding=UTF-8
 ```
 
-**EditorConfig settings**
+
+#### EditorConfig settings
 
 If modifying text verified/received files in an editor, it is desirable for the editor to respect the above conventions. For [EditorConfig](https://editorconfig.org/) enabled the following can be used:
 
 ```
 # Verify settings
-[*.{received,verified}.{txt,xml,json}]
+[*.{received,verified}.{json,txt,xml}]
 charset = "utf-8-bom"
 end_of_line = lf
 indent_size = unset
@@ -495,8 +635,126 @@ tab_width = unset
 trim_trailing_whitespace = false
 ```
 
+**Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.**<!-- endInclude -->
 
-*Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.*<!-- endInclude -->
+
+### Conventions check
+
+The above conventions can be checked by calling `VerifyChecks.Run()` in a test
+
+
+#### MSTest
+
+<!-- snippet: VerifyChecksMSTest -->
+<a id='snippet-VerifyChecksMSTest'></a>
+```cs
+[TestClass]
+public partial class VerifyChecksTests
+{
+    [TestMethod]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.MSTest.Tests/VerifyChecksTests.cs#L2-L10' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksMSTest' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+#### Expecto
+
+<!-- snippet: VerifyChecksExpecto -->
+<a id='snippet-VerifyChecksExpecto'></a>
+```cs
+public class VerifyChecksTests
+{
+    [Tests]
+    public static Test verifyChecksTest = Runner.TestCase(
+        nameof(verifyChecksTest),
+        () => VerifyChecks.Run(typeof(VerifyChecksTests).Assembly));
+}
+```
+<sup><a href='/src/Verify.Expecto.Tests/VerifyChecksTests.cs#L1-L9' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksExpecto' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+#### Fixie
+
+<!-- snippet: VerifyChecksFixie -->
+<a id='snippet-VerifyChecksFixie'></a>
+```cs
+public class VerifyChecksTests
+{
+    public Task Run() =>
+        VerifyChecks.Run(GetType().Assembly);
+}
+```
+<sup><a href='/src/Verify.Fixie.Tests/VerifyChecksTests.cs#L2-L8' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksFixie' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+#### Xunit
+
+<!-- snippet: VerifyChecksXunit -->
+<a id='snippet-VerifyChecksXunit'></a>
+```cs
+public class VerifyChecksTests
+{
+    [Fact]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.Xunit.Tests/VerifyChecksTests.cs#L2-L9' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksXunit' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+#### XunitV3
+
+<!-- snippet: VerifyChecksXunitV3 -->
+<a id='snippet-VerifyChecksXunitV3'></a>
+```cs
+public class VerifyChecksTests
+{
+    [Fact]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.XunitV3.Tests/VerifyChecksTests.cs#L2-L9' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksXunitV3' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+#### NUnit
+
+<!-- snippet: VerifyChecksNUnit -->
+<a id='snippet-VerifyChecksNUnit'></a>
+```cs
+[TestFixture]
+public class VerifyChecksTests
+{
+    [Test]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.NUnit.Tests/VerifyChecksTests.cs#L2-L10' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksNUnit' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+#### TUnit
+
+<!-- snippet: VerifyChecksTUnit -->
+<a id='snippet-VerifyChecksTUnit'></a>
+```cs
+public class VerifyChecksTests
+{
+    [Test]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.TUnit.Tests/VerifyChecksTests.cs#L2-L9' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksTUnit' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
 
 
 ## Static settings
@@ -542,7 +800,7 @@ var result = await Verify(
     });
 Assert.Contains("Value To Check", result.Text);
 ```
-<sup><a href='/src/Verify.Tests/Tests.cs#L374-L383' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyResult' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Tests.cs#L410-L419' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyResult' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 If using `Verifier.Throws`, the resulting `Exception` will also be accessible
@@ -553,7 +811,7 @@ If using `Verifier.Throws`, the resulting `Exception` will also be accessible
 var result = await Throws(MethodThatThrows);
 Assert.NotNull(result.Exception);
 ```
-<sup><a href='/src/Verify.Tests/ThrowsTests.cs#L175-L180' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExceptionResult' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/ThrowsTests.cs#L172-L177' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExceptionResult' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -632,25 +890,39 @@ information sources and warn about particular gotchas:
 
 ## Media
 
+
+### Blogs
+
+* [Snapshot Testing in .NET with Verify - Khalid Abuhakmeh (12 July 2024)](https://blog.jetbrains.com/dotnet/2024/07/11/snapshot-testing-in-net-with-verify/)
 * [Snapshot testing in C# with Verify - Tim Deschryver (21 Feb 2024)](https://timdeschryver.dev/bits/snapshot-testing-in-c-with-verify)
+* [Snapshot Testing in C# - William Rees (13 Feb 2024)](https://wil-rees.medium.com/snapshot-testing-with-verify-xunit-f1ae5127b800)
 * [I want to do a snapshot test with C# (26 Dec 2023)](https://zzzkan.me/blog/verify-tests/)
-* [Introduction to Snapshot testing and using Verify.Xunit - Betatalks (11 Oct 2023)](https://www.youtube.com/watch?v=RVmz3FZFIBU)
 * [I REGRET Not Telling Dave Farley THIS about Approval Testing - Emily Bache (27 Sep 2023)](https://www.youtube.com/watch?v=jOuqE_o9rmg)
-* [The Way to Test Legacy Code in C# - Gui Ferreira (19 Sep 2023)](https://www.youtube.com/watch?v=UC-AUnuTh0I)
 * [Today's random F# code: Using Verify to prevent breaking changes in stored data - Urs Enzler (31 Mar 2023)](https://www.planetgeek.ch/2023/03/31/todays-random-f-code-using-verify-to-prevent-breaking-changes-in-stored-data/)
-* [Compare object values in xUnit C# with Verify - Pierre Belin (18 Nov 2022)](https://goatreview.com/compare-object-values-xunit-csharp-verify/)
+* [Compare object values in xUnit C# with Verify - Pierre Belin (18 Nov 2022)](https://pierrebelin.medium.com/compare-object-values-in-xunit-c-with-verify-215d02b4ed39/)
 * [Unit testing assertions are now easier than ever with Verify Snapshot tool - Rana Krishnrajsinh (5 Nov 2022)](https://www.youtube.com/watch?v=T1ZPGi_dHFM)
 * [The easiest way to Unit Test with Verify in C# - Tomasz Juszczak (6 Sep 2022)](https://prographers.com/blog/the-easiest-way-to-unit-test-with-verify-in-c)
-* [Testing C# code reliably by freezing it in time - Nick Chapsas (1 Aug 2022)](https://www.youtube.com/watch?v=Q1_YkcPwpqY)
-* [Snapshot Testing in .NET with Verify - Dan Clarke (21 Jul 2022)](https://www.youtube.com/watch?v=wA7oJDyvn4c&t=1s)
 * [Testing an incremental generator with snapshot testing (14 Dec 2021)](https://andrewlock.net/creating-a-source-generator-part-2-testing-an-incremental-generator-with-snapshot-testing/)
-* [Snapshot Testing with Verify - Dan Clarke (10 Dec 2021)](https://www.danclarke.com/snapshot-testing-with-verify)
-* [OSS Power-Ups: Verify (14 Jul 2021)](https://www.youtube.com/watch?v=ZD5-51iCmU0)
-* [Unhandled Exception podcast: Snapshot Testing (26 Nov 2021)](https://unhandledexceptionpodcast.com/posts/0029-snapshottesting/)
 * [5 helpful Nuget package for Unit Testing in .NET (16 Oct 2021)](https://medium.com/@niteshsinghal85/5-helpful-nuget-package-for-unit-testing-in-net-87c2e087c6d)
-* [5 open source .NET projects that deserve more attention (9 Sep 2021)](https://www.youtube.com/watch?v=mwHWPoKEmyY&t=515s)
 * [Snapshot Testing with Verify: Carl Franklin's Blazor Train (3 Apr 2020)](https://rowell.heria.uk/blog/2020/11/23/verify-snapshot-testing-for-c)
 * [Verify: Snapshot Testing for C# (23 Nov 2020)](https://rowell.heria.uk/blog/2020/11/23/verify-snapshot-testing-for-c)
+
+
+### Podcasts
+
+* [Unhandled Exception podcast: Snapshot Testing (26 Nov 2021)](https://unhandledexceptionpodcast.com/posts/0029-snapshottesting/)
+* [Snapshot Testing with Verify - Dan Clarke (10 Dec 2021)](https://www.danclarke.com/snapshot-testing-with-verify)
+
+
+### Videos
+
+* [The Only Type of Testing U Need - Nick Chapsas (12 Nov 2024)](https://www.youtube.com/watch?v=JG4zt9CnIl4)
+* [Introduction to Snapshot testing and using Verify.Xunit - Betatalks (11 Oct 2023)](https://www.youtube.com/watch?v=RVmz3FZFIBU)
+* [The Way to Test Legacy Code in C# - Gui Ferreira (19 Sep 2023)](https://www.youtube.com/watch?v=UC-AUnuTh0I)
+* [Snapshot Testing in .NET with Verify - Dan Clarke (21 Jul 2022)](https://www.youtube.com/watch?v=wA7oJDyvn4c&t=1s)
+* [Testing C# code reliably by freezing it in time - Nick Chapsas (1 Aug 2022)](https://www.youtube.com/watch?v=Q1_YkcPwpqY)
+* [5 open source .NET projects that deserve more attention (9 Sep 2021)](https://www.youtube.com/watch?v=mwHWPoKEmyY&t=515s)
+* [OSS Power-Ups: Verify (14 Jul 2021)](https://www.youtube.com/watch?v=ZD5-51iCmU0)
 * [Verify Xunit Intro (26 Apr 2020)](https://www.youtube.com/watch?v=uGVogEltSkY)
 
 
@@ -658,14 +930,15 @@ information sources and warn about particular gotchas:
 
 * [Verify.AngleSharp](https://github.com/VerifyTests/Verify.AngleSharp): Html verification utilities via [AngleSharp](https://github.com/AngleSharp/AngleSharp).
 * [Verify.AspNetCore](https://github.com/VerifyTests/Verify.AspNetCore): Verification of AspNetCore bits.
-* [Verify.Aspose](https://github.com/VerifyTests/Verify.Aspose): Verification of documents (pdf, docx, xslx, and pptx) via Aspose.
+* [Verify.Aspose](https://github.com/VerifyTests/Verify.Aspose): Verification of documents (pdf, docx, xlsx, and pptx) via Aspose.
+* [Verify.Assertions](https://github.com/VerifyTests/Verify.Assertions): Extends Verify to allow an assertion callback. This enables using assertion libraries to interrogate during serialization.
 * [Verify.AustralianProtectiveMarkings](https://github.com/pmcau/AustralianProtectiveMarkings): Verification of AustralianProtectiveMarkings.
 * [Verify.Avalonia](https://github.com/VerifyTests/Verify.Avalonia): Verification of [Avalonia UIs](https://avaloniaui.net/).
-* [Verify.Blazor](https://github.com/VerifyTests/Verify.Blazor): Verification of [Blazor Component](https://docs.microsoft.com/en-us/aspnet/core/blazor/#components) via [bunit](https://bunit.egilhansen.com) or via raw Blazor rendering.
+* [Verify.Blazor](https://github.com/VerifyTests/Verify.Blazor): Verification of [Blazor Component](https://docs.microsoft.com/en-us/aspnet/core/blazor/#components) Blazor rendering.
+* [Verify.Bunit](https://github.com/VerifyTests/Verify.Bunit): Verification of [Blazor Component](https://docs.microsoft.com/en-us/aspnet/core/blazor/#components) via [bunit](https://bunit.egilhansen.com).
 * [Verify.Brighter](https://github.com/VerifyTests/Verify.Brighter): Verification of [Brighter](https://www.goparamore.io/) bits.
 * [Verify.CommunityToolkit.Mvvm](https://github.com/VerifyTests/Verify.CommunityToolkit.Mvvm): Verification of [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/).
 * [Verify.Cosmos](https://github.com/VerifyTests/Verify.Cosmos): Verification of [Azure CosmosDB](https://docs.microsoft.com/en-us/azure/cosmos-db/).
-* Bunsen-Burner support: [BunsenBurner.Verify.NUnit](https://github.com/bmazzarol/Bunsen-Burner/blob/main/BunsenBurner.Verify.NUnit/README.md) / [BunsenBurner.Verify.Xunit](https://github.com/bmazzarol/Bunsen-Burner/blob/main/BunsenBurner.Verify.Xunit/README.md).
 * [Verify.DiffPlex](https://github.com/VerifyTests/Verify.DiffPlex): Comparison of text via [DiffPlex](https://github.com/mmanela/diffplex).
 * [Verify.DocNet](https://github.com/VerifyTests/Verify.DocNet): Verification of pdfs via [DocNet](https://github.com/GowenGit/docnet).
 * [Verify.EntityFramework](https://github.com/VerifyTests/Verify.EntityFramework): Verification of EntityFramework bits.
@@ -705,7 +978,7 @@ information sources and warn about particular gotchas:
 * [Verify.Xamarin](https://github.com/VerifyTests/Verify.Xamarin): Verification of Xamarin UIs.
 * [Verify.Xaml](https://github.com/VerifyTests/Verify.Xaml): Verification of Xaml UIs.
 * [Spectre.Verify.Extensions](https://github.com/spectresystems/spectre.verify.extensions): Add an attribute driven file naming convention to Verify.
-* [Verify.Syncfusion](https://github.com/VerifyTests/Verify.Syncfusion): Verification of documents (pdf, docx, xslx, and pptx) via [Syncfusion File Formats](https://help.syncfusion.com/file-formats/introduction).
+* [Verify.Syncfusion](https://github.com/VerifyTests/Verify.Syncfusion): Verification of documents (pdf, docx, xlsx, and pptx) via [Syncfusion File Formats](https://help.syncfusion.com/file-formats/introduction).
 * [Verify.Wolverine](https://github.com/VerifyTests/Verify.Wolverine): Verifiable test context for [Wolverine](https://github.com/JasperFx/wolverine).
 * [Verify.ZeroLog](https://github.com/VerifyTests/Verify.ZeroLog): Verifiable test context for [ZeroLog](https://github.com/Abc-Arbitrage/ZeroLog).
 
@@ -725,6 +998,7 @@ information sources and warn about particular gotchas:
   * [File naming](/docs/naming.md)
   * [AppendFile](/docs/append-file.md)
   * [Parameterised tests](/docs/parameterised.md)
+  * [Combinations](/docs/combinations.md)
   * [Named Tuples](/docs/named-tuples.md)
   * [Scrubbers](/docs/scrubbers.md)
   * [Diff Engine](https://github.com/VerifyTests/DiffEngine)

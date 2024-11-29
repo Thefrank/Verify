@@ -1,25 +1,6 @@
-﻿namespace TheTests;
-
-#region UseParametersHashXunit
-
-public class ParametersHashSample
+﻿public class ParametersHashSample
 {
-    [Theory]
-    [InlineData("Value1")]
-    [InlineData("Value2")]
-    public Task UseHashedParametersUsage(string arg)
-    {
-        var settings = new VerifySettings();
-        settings.UseHashedParameters(arg);
-        return Verify(arg, settings);
-    }
-
-    [Theory]
-    [InlineData("Value1")]
-    [InlineData("Value2")]
-    public Task UseHashedParametersUsageFluent(string arg) =>
-        Verify(arg)
-            .UseHashedParameters(arg);
+    #region UseParametersHashInstanceXunit
 
     [Theory]
     [InlineData("Value1")]
@@ -32,6 +13,10 @@ public class ParametersHashSample
         return Verify(arg, settings);
     }
 
+    #endregion
+
+    #region UseParametersHashFluentXunit
+
     [Theory]
     [InlineData("Value1")]
     [InlineData("Value2")]
@@ -39,6 +24,6 @@ public class ParametersHashSample
         Verify(arg)
             .UseParameters(arg)
             .HashParameters();
-}
 
-#endregion
+    #endregion
+}

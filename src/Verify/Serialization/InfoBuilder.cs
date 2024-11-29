@@ -3,7 +3,7 @@
     object? root;
     List<Item> inner = [];
 
-    public InfoBuilder(object? root, List<ToAppend> appends)
+    public InfoBuilder(object? root, IEnumerable<ToAppend> appends)
     {
         this.root = root;
         foreach (var append in appends)
@@ -70,6 +70,11 @@
 
             foreach (var item in value.inner)
             {
+                if (writer.serialization.ShouldIgnoreByName(item.Key))
+                {
+                    continue;
+                }
+
                 writer.WritePropertyName(item.Key);
                 if (writer.serialization.ShouldScrubByName(item.Key))
                 {

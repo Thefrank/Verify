@@ -31,9 +31,10 @@ dotnet add package Verify.NUnit
 If `ImplicitUsings` are not enabled, substitute usages of `Verify()` with `Verifier.Verify()`.<!-- endInclude -->
 
 
-## Source Control
+## Conventions
 
-### Includes/Excludes
+
+### Source Control Includes/Excludes
 
  * **All `*.received.*` files should be excluded from source control.**<!-- include: include-exclude. path: /docs/mdsource/include-exclude.include.md -->
 
@@ -50,6 +51,7 @@ If using [UseSplitModeForUniqueDirectory](/docs/naming.md#usesplitmodeforuniqued
 
 All `*.verified.*` files should be committed to source control.<!-- endInclude -->
 
+
 ### Text file settings
 
 Text variants of verified and received have the following characteristics:<!-- include: text-file-settings. path: /docs/mdsource/text-file-settings.include.md -->
@@ -61,7 +63,7 @@ Text variants of verified and received have the following characteristics:<!-- i
 This manifests in several ways:
 
 
-**Source control settings**
+#### Source control settings
 
 All text extensions of `*.verified.*` should have:
 
@@ -76,13 +78,14 @@ eg add the following to `.gitattributes`
 *.verified.json text eol=lf working-tree-encoding=UTF-8
 ```
 
-**EditorConfig settings**
+
+#### EditorConfig settings
 
 If modifying text verified/received files in an editor, it is desirable for the editor to respect the above conventions. For [EditorConfig](https://editorconfig.org/) enabled the following can be used:
 
 ```
 # Verify settings
-[*.{received,verified}.{txt,xml,json}]
+[*.{received,verified}.{json,txt,xml}]
 charset = "utf-8-bom"
 end_of_line = lf
 indent_size = unset
@@ -92,8 +95,26 @@ tab_width = unset
 trim_trailing_whitespace = false
 ```
 
+**Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.**<!-- endInclude -->
 
-*Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.*<!-- endInclude -->
+
+### Conventions check
+
+Conventions can be checked by calling `VerifyChecks.Run()` in a test
+
+<!-- snippet: VerifyChecksNUnit -->
+<a id='snippet-VerifyChecksNUnit'></a>
+```cs
+[TestFixture]
+public class VerifyChecksTests
+{
+    [Test]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.NUnit.Tests/VerifyChecksTests.cs#L2-L10' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksNUnit' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
 
 ## DiffPlex
 
@@ -174,7 +195,7 @@ Directly after the test runner step add a build step to set a flag if the testru
     script: 'echo ##vso[task.setvariable variable=publishverify]Yes'
 ```
 
-Since the PublishBuildArtifacts step in DevOps does not allow a wildcard it is necessary to need stage the 'received' files before publishing:
+Since the PublishBuildArtifacts step in DevOps does not allow a wildcard it is necessary to stage the 'received' files before publishing:
 
 ```yaml
 - task: CopyFiles@2

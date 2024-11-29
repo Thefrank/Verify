@@ -1,40 +1,30 @@
 ﻿// ReSharper disable UnusedParameter.Local
 
+// ReSharper disable ArrangeObjectCreationWhenTypeNotEvident
 [TestFixture]
 public class Tests
 {
-    static void DerivePathInfo()
-    {
-        #region DerivePathInfoNunit
-
+    static void DerivePathInfo() =>
+    #region DerivePathInfoNunit
         Verifier.DerivePathInfo(
             (sourceFile, projectDirectory, type, method) => new(
                 directory: Path.Combine(projectDirectory, "Snapshots"),
                 typeName: type.Name,
                 methodName: method.Name));
-
-        #endregion
-    }
+    #endregion
 
     [TestCase("Value1")]
     public Task UseFileNameWithParam(string arg) =>
         Verify(arg)
             .UseFileName("UseFileNameWithParam");
 
-    [TestCase("Value1")]
-    public Task UseTextForParameters(string arg) =>
-        Verify(arg)
-            .UseTextForParameters("TextForParameter");
-
     [TestCase("Value1", TestName = "CustomName")]
     public Task TestCaseWithName(string arg) =>
-        Verify(arg)
-            .UseTextForParameters("TextForParameter");
+        Verify(arg);
 
     [TestCase("Value1", TestName = "Custom>Name")]
     public Task TestCaseWithNameAndInvalidChars(string arg) =>
-        Verify(arg)
-            .UseTextForParameters("TextForParameter");
+        Verify(arg);
 
     [Test]
     public Task StringTarget() =>
@@ -49,26 +39,24 @@ public class Tests
             {
                 Property = "Value"
             },
-            new[]
-            {
+            [
                 new Target(
                     extension: "txt",
                     data: "Raw target value",
                     name: "targetName")
-            });
+            ]);
 
     #endregion
 
     [Test]
     public Task EnumerableTargets() =>
         Verify(
-            new[]
-            {
-                new Target(
+        [
+            new Target(
                     extension: "txt",
                     data: "Raw target value",
                     name: "targetName")
-            });
+        ]);
 
     static string directoryPathToVerify = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify");
     static string pathToArchive = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify.zip");
@@ -89,6 +77,14 @@ public class Tests
 
     #endregion
 
+    #region VerifyZipWithStructureNunit
+
+    [Test]
+    public Task WithZipAndStructure() =>
+        VerifyZip(pathToArchive, includeStructure: true);
+
+    #endregion
+
     static List<TestAttachment> GetAttachments() =>
         TestExecutionContext.CurrentContext.CurrentResult.TestAttachments.ToList();
 
@@ -104,6 +100,8 @@ public class Tests
         var file = Path.GetFileName(list[0].FilePath);
         AreEqual($"Tests.ChangeHasAttachment.{Namer.TargetFrameworkNameAndVersion}.received.txt", file);
     }
+
+#if NET9_0
 
     [Test]
     public async Task AutoVerifyHasAttachment()
@@ -121,6 +119,8 @@ public class Tests
         var file = Path.GetFileName(list[0].FilePath);
         AreEqual($"Tests.AutoVerifyHasAttachment.{Namer.TargetFrameworkNameAndVersion}.received.txt", file);
     }
+
+#endif
 
     [Test]
     public void NewHasAttachment()
@@ -141,7 +141,7 @@ public class Tests
         var settings = new VerifySettings();
         settings.DisableDiff();
         ThrowsAsync<VerifyException>(
-            () => Verify("Bar", [new Target("txt", "Value")], settings));
+            () => Verify("Bar", [new("txt", "Value")], settings));
         var list = GetAttachments();
         AreEqual(2, list.Count);
         var file0 = Path.GetFileName(list[0].FilePath);
@@ -156,7 +156,7 @@ public class Tests
         var settings = new VerifySettings();
         settings.DisableDiff();
         ThrowsAsync<VerifyException>(
-            () => Verify("Bar",[new Target("txt", "Value")], settings));
+            () => Verify("Bar", [new("txt", "Value")], settings));
         var list = GetAttachments();
         AreEqual(2, list.Count);
         var file0 = Path.GetFileName(list[0].FilePath);

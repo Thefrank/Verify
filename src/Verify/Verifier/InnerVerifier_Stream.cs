@@ -61,7 +61,7 @@ partial class InnerVerifier
             targets.Insert(
                 0,
                 new(
-                    VerifierSettings.TxtOrJson,
+                    settings.TxtOrJson,
                     JsonFormatter.AsJson(settings, counter, info)));
         }
 
@@ -73,6 +73,7 @@ partial class InnerVerifier
 
     public async Task<VerifyResult> VerifyStream(Stream? stream, string extension, object? info)
     {
+        Guards.AgainstBadExtension(extension);
         if (stream is null)
         {
             if (info is null)
@@ -100,7 +101,7 @@ partial class InnerVerifier
             {
                 targets.Add(
                     new(
-                        VerifierSettings.TxtOrJson,
+                        settings.TxtOrJson,
                         JsonFormatter.AsJson(settings, counter, info)));
             }
 
@@ -121,7 +122,7 @@ partial class InnerVerifier
 
     async Task<(object? info, List<Target> targets, Func<Task> cleanup)> DoExtensionConversion(string extension, Stream stream, object? info)
     {
-        Func<Task> cleanup = stream.DisposeAsyncEx;
+        var cleanup = stream.DisposeAsyncEx;
         var infos = new List<object>();
         if (info != null)
         {

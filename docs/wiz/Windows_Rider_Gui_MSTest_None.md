@@ -17,12 +17,11 @@ Add the following packages to the test project:
 <!-- snippet: mstest-nugets -->
 <a id='snippet-mstest-nugets'></a>
 ```csproj
-<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-<PackageReference Include="MSTest.TestAdapter" Version="3.3.1" />
-<PackageReference Include="MSTest.TestFramework" Version="3.3.1" />
-<PackageReference Include="Verify.MSTest" Version="24.1.0" />
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+<PackageReference Include="MSTest" Version="3.6.3" />
+<PackageReference Include="Verify.MSTest" Version="28.3.2" />
 ```
-<sup><a href='/src/NugetUsage/MSTestNugetUsage/MSTestNugetUsage.csproj#L7-L12' title='Snippet source file'>snippet source</a> | <a href='#snippet-mstest-nugets' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/usages/MSTestNugetUsage/MSTestNugetUsage.csproj#L7-L11' title='Snippet source file'>snippet source</a> | <a href='#snippet-mstest-nugets' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -37,9 +36,10 @@ Add the following packages to the test project:
 If `ImplicitUsings` are not enabled, substitute usages of `Verify()` with `Verifier.Verify()`.<!-- endInclude -->
 
 
-## Source Control
+## Conventions
 
-### Includes/Excludes
+
+### Source Control Includes/Excludes
 
  * **All `*.received.*` files should be excluded from source control.**<!-- include: include-exclude. path: /docs/mdsource/include-exclude.include.md -->
 
@@ -56,6 +56,7 @@ If using [UseSplitModeForUniqueDirectory](/docs/naming.md#usesplitmodeforuniqued
 
 All `*.verified.*` files should be committed to source control.<!-- endInclude -->
 
+
 ### Text file settings
 
 Text variants of verified and received have the following characteristics:<!-- include: text-file-settings. path: /docs/mdsource/text-file-settings.include.md -->
@@ -67,7 +68,7 @@ Text variants of verified and received have the following characteristics:<!-- i
 This manifests in several ways:
 
 
-**Source control settings**
+#### Source control settings
 
 All text extensions of `*.verified.*` should have:
 
@@ -82,13 +83,14 @@ eg add the following to `.gitattributes`
 *.verified.json text eol=lf working-tree-encoding=UTF-8
 ```
 
-**EditorConfig settings**
+
+#### EditorConfig settings
 
 If modifying text verified/received files in an editor, it is desirable for the editor to respect the above conventions. For [EditorConfig](https://editorconfig.org/) enabled the following can be used:
 
 ```
 # Verify settings
-[*.{received,verified}.{txt,xml,json}]
+[*.{received,verified}.{json,txt,xml}]
 charset = "utf-8-bom"
 end_of_line = lf
 indent_size = unset
@@ -98,8 +100,26 @@ tab_width = unset
 trim_trailing_whitespace = false
 ```
 
+**Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.**<!-- endInclude -->
 
-*Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.*<!-- endInclude -->
+
+### Conventions check
+
+Conventions can be checked by calling `VerifyChecks.Run()` in a test
+
+<!-- snippet: VerifyChecksMSTest -->
+<a id='snippet-VerifyChecksMSTest'></a>
+```cs
+[TestClass]
+public partial class VerifyChecksTests
+{
+    [TestMethod]
+    public Task Run() =>
+        VerifyChecks.Run();
+}
+```
+<sup><a href='/src/Verify.MSTest.Tests/VerifyChecksTests.cs#L2-L10' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyChecksMSTest' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
 
 
 ## DiffEngineTray
@@ -163,6 +183,18 @@ File | Settings | Manage Layers | This computer | Edit Layer | Build, Execution,
 
 <img src="/docs/rider-ignore-spawned.png" alt="Disable R# orphaned processes detection" width="500"><!-- endInclude -->
 
+
+## Treat "return value of pure method is not used" as error
+
+Verify uses the [PureAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.contracts.pureattribute) to mark methods where the result of the method is expected to be used. For example awaiting the call to `Verify()`.<!-- include: pure. path: /docs/mdsource/pure.include.md -->
+Rider and ReSharper can be configured to treat an un-used return value as an error.
+Add the following to the `.editorconfig` file:
+
+```
+[*.cs]
+resharper_return_value_of_pure_method_is_not_used_highlighting = error
+```
+<!-- endInclude -->
 ## DiffPlex
 
 The text comparison behavior of Verify is pluggable. The default behaviour, on failure, is to output both the received
@@ -193,8 +225,7 @@ public static void Initialize() =>
 <a id='snippet-SampleTestMSTest'></a>
 ```cs
 [TestClass]
-public class Sample :
-    VerifyBase
+public partial class Sample
 {
     [TestMethod]
     public Task Test()
@@ -204,8 +235,45 @@ public class Sample :
     }
 }
 ```
-<sup><a href='/src/Verify.MSTest.Tests/Snippets/Sample.cs#L3-L17' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestMSTest' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.MSTest.Tests/Snippets/Sample.cs#L1-L14' title='Snippet source file'>snippet source</a> | <a href='#snippet-SampleTestMSTest' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
+
+
+### Marking tests as 'Using Verify'
+
+The MSTest implementation leverages a [Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) and requires test classes to opt in to being processed by the Source Generator.<!-- include: mstest-marker. path: /docs/mdsource/mstest-marker.include.md -->
+
+Add the `UsesVerifyAttribute`.
+
+For all test classes in an assembly:
+
+```
+[assembly: UsesVerify]
+```
+
+For a specific a test class:
+
+```
+[UsesVerify]
+```
+
+Or inherit from `VerifyBase`:
+
+<!-- snippet: VerifyBaseUsage.cs -->
+<a id='snippet-VerifyBaseUsage.cs'></a>
+```cs
+[TestClass]
+public class VerifyBaseUsage :
+    VerifyBase
+{
+    [TestMethod]
+    public Task Simple() =>
+        Verify("The content");
+}
+```
+<sup><a href='/src/Verify.MSTest.Tests/VerifyBaseUsage.cs#L1-L8' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyBaseUsage.cs' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+<!-- endInclude -->
 
 ## Diff Tool
 

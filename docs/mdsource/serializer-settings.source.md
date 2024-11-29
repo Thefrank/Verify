@@ -41,7 +41,7 @@ snippet: UseStrictJsonFluent
 
 #### Result
 
-Then this result in
+Then this results in
 
  * The default `.received.` and `.verified.` extensions for serialized verification to be `.json`.
  * `JsonTextWriter.QuoteChar` to be `"`.
@@ -382,6 +382,63 @@ Json and JObject are not sorted.
 To enable sorting use:
 
 snippet: SortJsonObjects
+
+
+## Ordering IEnumerable items
+
+Items in an instance of an IEnumerable can be ordered.
+
+This is helpful when verifying items that can have an inconsistent order, for example reading items from a database.
+
+
+### OrderEnumerableBy
+
+
+#### Globally
+
+snippet: OrderEnumerableByGlobal
+
+
+#### Instance
+
+snippet: OrderEnumerableBy
+
+
+#### Fluent
+
+snippet: OrderEnumerableByFluent
+
+
+#### Result
+
+The resulting file will be:
+
+snippet: OrderTests.EnumerableOrder.verified.txt
+
+
+### OrderEnumerableByDescending
+
+
+#### Globally
+
+snippet: OrderEnumerableByDescendingGlobal
+
+
+#### Instance
+
+snippet: OrderEnumerableByDescending
+
+
+#### Fluent
+
+snippet: OrderEnumerableByDescendingFluent
+
+
+#### Result
+
+The resulting file will be:
+
+snippet: OrderTests.OrderEnumerableByDescending.verified.txt
 
 
 ## JsonAppender

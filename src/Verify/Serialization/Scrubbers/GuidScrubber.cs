@@ -28,7 +28,8 @@
                 (end == value.Length || !IsInvalidEndingChar(value[end])))
             {
                 var slice = value.Slice(index, 36);
-                if (!slice.ContainsNewline() && TryParse(slice, out var guid))
+                if (!slice.ContainsNewline() &&
+                    TryParse(slice, out var guid))
                 {
                     var convert = SerializationSettings.Convert(counter, guid);
                     builder.Overwrite(convert, builderIndex, 36);
@@ -43,14 +44,12 @@
         }
     }
 
-    static bool TryParse(CharSpan slice, out Guid guid)
-    {
+    static bool TryParse(CharSpan slice, out Guid guid) =>
 #if NET6_0_OR_GREATER
-        return Guid.TryParseExact(slice, "D", out guid);
+        Guid.TryParseExact(slice, "D", out guid);
 #else
-        return Guid.TryParseExact(slice.ToString(), "D", out guid);
+        Guid.TryParseExact(slice.ToString(), "D", out guid);
 #endif
-    }
 
     static bool IsInvalidEndingChar(char ch) =>
         IsInvalidChar(ch) &&

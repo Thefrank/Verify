@@ -1,20 +1,15 @@
 ﻿// ReSharper disable UnusedParameter.Local
 
+// ReSharper disable ArrangeObjectCreationWhenTypeNotEvident
 public class Tests
 {
     // ReSharper disable once UnusedMember.Local
-    static void DerivePathInfo()
-    {
-        #region DerivePathInfoXUnit
-
+    static void DerivePathInfo() =>
         Verifier.DerivePathInfo(
             (sourceFile, projectDirectory, type, method) => new(
                 directory: Path.Combine(projectDirectory, "Snapshots"),
                 typeName: type.Name,
                 methodName: method.Name));
-
-        #endregion
-    }
 
     [Theory]
     [InlineData("Value1")]
@@ -28,19 +23,15 @@ public class Tests
             .UseFileName("UseFileNameWithParam");
 
     public static IEnumerable<object[]> GetData() =>
-        new[]
-        {
-            new object[]
-            {
-                "Value1"
-            }
-        };
+    [
+        [
+            "Value1"
+        ]
+    ];
 
     [Fact]
     public Task StringTarget() =>
         Verify(new Target("txt", "Value"));
-
-    #region ExplicitTargetsXunit
 
     [Fact]
     public Task WithTargets() =>
@@ -49,15 +40,12 @@ public class Tests
             {
                 Property = "Value"
             },
-            new[]
-            {
-                new Target(
+            [
+                new(
                     extension: "txt",
                     data: "Raw target value",
                     name: "targetName")
-            });
-
-    #endregion
+            ]);
 
     [ModuleInitializer]
     public static void InitWithTargetsAndConverter() =>
@@ -66,10 +54,7 @@ public class Tests
             (_, _) =>
                 new(
                     "theInfo",
-                    new List<Target>
-                    {
-                        new("txt", "text from converter")
-                    }));
+                    [new("txt", "text from converter")]));
 
     [Fact]
     public Task WithTargetsAndConverter() =>
@@ -78,46 +63,34 @@ public class Tests
             {
                 Property = "Value"
             },
-            new[]
-            {
-                new Target(
+            [
+                new(
                     extension: "WithTargetsAndConverter",
                     data: new MemoryStream(),
                     name: "targetName")
-            });
+            ]);
 
     [Fact]
     public Task EnumerableTargets() =>
         Verify(
-            new[]
-            {
-                new Target(
-                    extension: "txt",
-                    data: "Raw target value",
-                    name: "targetName")
-            });
+        [
+            new Target(
+                extension: "txt",
+                data: "Raw target value",
+                name: "targetName")
+        ]);
 
     static string directoryToVerify = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify");
-
-    #region VerifyDirectoryXunit
 
     [Fact]
     public Task WithDirectory() =>
         VerifyDirectory(directoryToVerify);
-
-    #endregion
-
-    #region VerifyDirectoryWithInfo
 
     [Fact]
     public Task VerifyDirectoryWithInfo() =>
         VerifyDirectory(
             directoryToVerify,
             info: "the info");
-
-    #endregion
-
-    #region VerifyDirectoryWithFileScrubber
 
     [Fact]
     public Task VerifyDirectoryWithFileScrubber() =>
@@ -132,11 +105,7 @@ public class Tests
                 }
             });
 
-    #endregion
-
 #if !NET48
-
-    #region VerifyDirectoryFilterXunit
 
     [Fact]
     public Task WithDirectoryFiltered() =>
@@ -149,31 +118,19 @@ public class Tests
                 RecurseSubdirectories = false
             });
 
-    #endregion
-
 #endif
 
     static string zipPath = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify.zip");
 
-    #region VerifyZipXunit
-
     [Fact]
     public Task WithZip() =>
         VerifyZip(zipPath);
-
-    #endregion
-
-    #region VerifyZipWithInfo
 
     [Fact]
     public Task VerifyZipWithInfo() =>
         VerifyZip(
             zipPath,
             info: "the info");
-
-    #endregion
-
-    #region VerifyZipWithFileScrubber
 
     [Fact]
     public Task VerifyZipWithFileScrubber() =>
@@ -188,15 +145,9 @@ public class Tests
                 }
             });
 
-    #endregion
-
-    #region VerifyZipFilterXunit
-
     [Fact]
     public Task WithZipFiltered() =>
         VerifyZip(
             zipPath,
             include: filePath => filePath.FullName.Contains("Doc"));
-
-    #endregion
 }

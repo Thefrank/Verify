@@ -1,6 +1,4 @@
-﻿using Argon;
-
-// ReSharper disable NotAccessedField.Local
+﻿// ReSharper disable NotAccessedField.Local
 
 // Non-nullable field is uninitialized
 #pragma warning disable CS8618
@@ -19,8 +17,6 @@ public class VerifyObjectSamples
         settings.AddExtraSettings(_ => _.TypeNameHandling = TypeNameHandling.All);
         return Verify(person, settings);
     }
-
-    #region AnonXunit
 
     [Fact]
     public Task Anon()
@@ -43,8 +39,6 @@ public class VerifyObjectSamples
                 person2
             });
     }
-
-    #endregion
 
     class Person
     {

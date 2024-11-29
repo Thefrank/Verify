@@ -1,4 +1,4 @@
-﻿// ReSharper disable ConvertToUsingDeclaration
+// ReSharper disable ConvertToUsingDeclaration
 // ReSharper disable UseAwaitUsing
 
 [DebuggerDisplay("new = {new.Count} | notEquals = {notEquals.Count} | equal = {equal.Count} | delete = {delete.Count}")]
@@ -11,7 +11,8 @@ class VerifyEngine(
     string? typeName,
     string? methodName)
 {
-    bool diffEnabled = !DiffRunner.Disabled && settings.diffEnabled;
+    bool diffEnabled = !DiffRunner.Disabled &&
+                       settings.diffEnabled;
     List<NewResult> @new = [];
     List<NotEqualResult> notEquals = [];
     List<FilePair> equal = [];
@@ -125,13 +126,15 @@ class VerifyEngine(
             return;
         }
 
-        var allDeletesDerified = await ProcessDeletes();
+        var allDeletesVerified = await ProcessDeletes();
 
         var allNewVerified = await ProcessNew();
 
         var allNotEqualsVerified = await ProcessNotEquals();
 
-        if (allDeletesDerified && allNewVerified && allNotEqualsVerified)
+        if (allDeletesVerified &&
+            allNewVerified &&
+            allNotEqualsVerified)
         {
             return;
         }
@@ -165,10 +168,10 @@ class VerifyEngine(
         var verified = true;
         foreach (var item in delete)
         {
-           if(!await ProcessDeletes(item))
-           {
-               verified = false;
-           }
+            if (!await ProcessDeletes(item))
+            {
+                verified = false;
+            }
         }
 
         return verified;

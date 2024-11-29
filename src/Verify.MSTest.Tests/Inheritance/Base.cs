@@ -1,8 +1,5 @@
-﻿namespace TheTests;
-
 [TestClass]
-public class Base :
-    VerifyBase
+public partial class Base
 {
     [TestMethod]
     public Task TestInBase() =>

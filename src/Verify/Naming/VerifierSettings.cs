@@ -60,17 +60,26 @@ public static partial class VerifierSettings
     public static void NameForParameter<T>(ParameterToName<T> func)
     {
         InnerVerifier.ThrowIfVerifyHasBeenRun();
-        parameterToNameLookup[typeof(T)] = o => func((T) o);
+        parameterToNameLookup[typeof(T)] = _ => func((T) _);
     }
 
-    public static string GetNameForParameter(object? parameter)
+    public static string GetNameForParameter(object? parameter) =>
+        GetNameForParameter(parameter, true);
+
+    // ReSharper disable once MethodOverloadWithOptionalParameter
+    public static string GetNameForParameter(object? parameter, bool pathFriendly = true)
     {
+        if (parameter is null)
+        {
+            return "null";
+        }
+
         var builder = new StringBuilder();
-        AppendParameter(parameter, builder, true);
+        AppendParameter(parameter, builder, true, pathFriendly);
         return builder.ToString();
     }
 
-    internal static void AppendParameter(object? parameter, StringBuilder builder, bool isRoot)
+    internal static void AppendParameter(object? parameter, StringBuilder builder, bool isRoot, bool pathFriendly = true)
     {
         while (true)
         {
@@ -82,25 +91,24 @@ public static partial class VerifierSettings
 
             if (parameter is string stringParameter)
             {
-                FileNameCleaner.AppendValid(builder, stringParameter);
+                if (pathFriendly)
+                {
+                    FileNameCleaner.AppendValid(builder, stringParameter);
+                }
+                else
+                {
+                    builder.Append(stringParameter);
+                }
+
                 return;
             }
 
             var type = parameter.GetType();
 
-            if (parameterToNameLookup.TryGetValue(type, out var lookup))
+            if (TryGetParameterToNameLookup(type, out var lookup))
             {
                 builder.Append(lookup(parameter));
                 return;
-            }
-
-            foreach (var (key, value) in parameterToNameLookup)
-            {
-                if (key.IsAssignableFrom(type))
-                {
-                    builder.Append(value(parameter));
-                    return;
-                }
             }
 
             if (parameter.TryGetCollectionOrDictionary(out var isEmpty, out var enumerable))
@@ -132,11 +140,9 @@ public static partial class VerifierSettings
                 return;
             }
 
-            if (type.IsGeneric(typeof(KeyValuePair<,>)))
+            if (TryGetKeyValue(type, parameter, out var key, out var value))
             {
-                var key = type.GetProperty("Key")!.GetMethod!.Invoke(parameter, null);
-                var value = type.GetProperty("Value")!.GetMethod!.Invoke(parameter, null);
-                AppendParameter(key, builder, true);
+                AppendParameter(key, builder, true, pathFriendly);
                 builder.Append('=');
                 parameter = value;
                 isRoot = true;
@@ -150,9 +156,57 @@ public static partial class VerifierSettings
                 throw new($"{type.FullName} returned a null for `ToString()`.");
             }
 
-            FileNameCleaner.AppendValid(builder, nameForParameter);
+            if (pathFriendly)
+            {
+                FileNameCleaner.AppendValid(builder, nameForParameter);
+            }
+            else
+            {
+                builder.Append(nameForParameter);
+            }
             break;
         }
+    }
+
+    static bool TryGetKeyValue(Type type, object target, out object? key, out object? value)
+    {
+        if (!type.IsGeneric(typeof(KeyValuePair<,>)))
+        {
+            key = null;
+            value = null;
+            return false;
+        }
+
+#if NETFRAMEWORK
+        key = type.GetProperty("Key")!.GetMethod!.Invoke(target, null);
+        value = type.GetProperty("Value")!.GetMethod!.Invoke(target, null);
+#else
+        var parameters = new object?[] { null, null };
+        type.GetMethod("Deconstruct")!.Invoke(target, parameters);
+        key = parameters[0];
+        value = parameters[1];
+#endif
+
+        return true;
+    }
+
+    static bool TryGetParameterToNameLookup(Type type, [NotNullWhen(true)] out Func<object, string>? lookup)
+    {
+        if (parameterToNameLookup.TryGetValue(type, out lookup))
+        {
+            return true;
+        }
+
+        foreach (var (key, value) in parameterToNameLookup)
+        {
+            if (key.IsAssignableFrom(type))
+            {
+                lookup = value;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

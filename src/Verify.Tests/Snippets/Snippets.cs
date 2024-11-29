@@ -25,29 +25,18 @@ public class Snippets
         #endregion
     }
 
-    void EnableClipboard()
-    {
-        #region EnableClipboard
-
+    void EnableClipboard() =>
+    #region EnableClipboard
         ClipboardAccept.Enable();
+    #endregion
 
-        #endregion
-    }
-
-    void TreatAsString()
-    {
-        #region TreatAsString
-
+    void TreatAsString() =>
+    #region TreatAsString
         VerifierSettings.TreatAsString<ClassWithToString>(
             (target, settings) => target.Property);
+    #endregion
 
-        #endregion
-    }
-
-    class ClassWithToString
-    {
-        public string Property { get; } = null!;
-    }
+    record ClassWithToString(string Property);
 
     void DerivePathInfoAppVeyor()
     {
@@ -140,15 +129,12 @@ public class Snippets
         #endregion
     }
 
-    void Converter()
-    {
-        #region JsonConverter
-
+    void Converter() =>
+    #region JsonConverter
         VerifierSettings.AddExtraSettings(
             _ => _.Converters.Add(new CompanyConverter()));
+    #endregion
 
-        #endregion
-    }
 
     #region CompanyConverter
 
@@ -161,10 +147,7 @@ public class Snippets
 
     #endregion
 
-    class Company
-    {
-        public string Name { get; } = null!;
-    }
+    record Company(string Name);
 
     async Task VerifyFuncOfTaskOfT()
     {

@@ -187,10 +187,48 @@ public class VerifyJsonWriter :
     /// <summary>
     /// Writes a property name and value while respecting other custom serialization settings.
     /// </summary>
+    public void WriteMember<T>(object target, T? value, string name, T defaultIgnore)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        if (EqualityComparer<T>.Default.Equals(value, defaultIgnore))
+        {
+            return;
+        }
+
+        WriteMember(target, value, name);
+    }
+
+    /// <summary>
+    /// Writes a property name and value while respecting other custom serialization settings.
+    /// </summary>
     public void WriteMember(object target, object? value, string name)
     {
         if (value is null)
         {
+            if (serialization.TryGetScrubOrIgnoreByName(name, out var scrubOrIgnoreByName))
+            {
+                if (scrubOrIgnoreByName == ScrubOrIgnore.Ignore)
+                {
+                    return;
+                }
+
+                WritePropertyName(name);
+                WriteRawValueIfNoStrict("Scrubbed");
+
+                return;
+            }
+
+            if (serialization.Serializer.NullValueHandling.GetValueOrDefault(NullValueHandling.Ignore) == NullValueHandling.Ignore)
+            {
+                return;
+            }
+
+            WritePropertyName(name);
+            WriteNull();
             return;
         }
 

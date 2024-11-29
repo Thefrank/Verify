@@ -24,22 +24,21 @@ public Task WithTargets() =>
         {
             Property = "Value"
         },
-        new[]
-        {
+        [
             new Target(
                 extension: "txt",
                 data: "Raw target value",
                 name: "targetName")
-        });
+        ]);
 ```
-<sup><a href='/src/Verify.NUnit.Tests/Tests.cs#L43-L60' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsNunit' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.NUnit.Tests/Tests.cs#L33-L49' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsNunit' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
 ## Xunit
 
-<!-- snippet: ExplicitTargetsXunit -->
-<a id='snippet-ExplicitTargetsXunit'></a>
+<!-- snippet: ExplicitTargetsXunitV3 -->
+<a id='snippet-ExplicitTargetsXunitV3'></a>
 ```cs
 [Fact]
 public Task WithTargets() =>
@@ -48,15 +47,14 @@ public Task WithTargets() =>
         {
             Property = "Value"
         },
-        new[]
-        {
-            new Target(
+        [
+            new(
                 extension: "txt",
                 data: "Raw target value",
                 name: "targetName")
-        });
+        ]);
 ```
-<sup><a href='/src/Verify.Xunit.Tests/Tests.cs#L43-L60' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsXunit' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.XunitV3.Tests/Tests.cs#L39-L55' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsXunitV3' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -71,22 +69,21 @@ public Task WithTargets() =>
         {
             Property = "Value"
         },
-        new[]
-        {
-            new Target(
+        [
+            new(
                 extension: "txt",
                 data: "Raw target value",
                 name: "targetName")
-        });
+        ]);
 ```
-<sup><a href='/src/Verify.Fixie.Tests/Tests.cs#L32-L48' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsFixie' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Fixie.Tests/Tests.cs#L26-L41' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsFixie' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
 ## MsTest
 
-<!-- snippet: ExplicitTargetsMsTest -->
-<a id='snippet-ExplicitTargetsMsTest'></a>
+<!-- snippet: ExplicitTargetsMSTest -->
+<a id='snippet-ExplicitTargetsMSTest'></a>
 ```cs
 [TestMethod]
 public Task WithTargets() =>
@@ -103,7 +100,30 @@ public Task WithTargets() =>
                 name: "targetName")
         ]);
 ```
-<sup><a href='/src/Verify.MSTest.Tests/Tests.cs#L128-L145' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsMsTest' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.MSTest.Tests/Tests.cs#L130-L147' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsMSTest' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+## TUnit
+
+<!-- snippet: ExplicitTargetsTUnit -->
+<a id='snippet-ExplicitTargetsTUnit'></a>
+```cs
+[Test]
+public Task WithTargets() =>
+    Verify(
+        new
+        {
+            Property = "Value"
+        },
+        [
+            new Target(
+                extension: "txt",
+                data: "Raw target value",
+                name: "targetName")
+        ]);
+```
+<sup><a href='/src/Verify.TUnit.Tests/Tests.cs#L28-L44' title='Snippet source file'>snippet source</a> | <a href='#snippet-ExplicitTargetsTUnit' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 

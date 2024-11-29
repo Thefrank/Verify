@@ -37,9 +37,10 @@ public partial class InnerVerifier :
         IReadOnlyList<string>? methodParameters,
         PathInfo pathInfo)
     {
-        Guard.AgainstEmpty(sourceFile);
-        Guard.AgainstEmpty(typeName);
-        Guard.AgainstEmpty(methodName);
+        Guard.NotEmpty(sourceFile);
+        Guard.NotEmpty(typeName);
+        Guard.NotEmpty(methodName);
+        Guard.NotEmpty(methodParameters);
         verifyHasBeenRun = true;
         settings.RunBeforeCallbacks();
         this.settings = settings;
@@ -47,7 +48,7 @@ public partial class InnerVerifier :
         this.typeName = typeName;
         this.methodName = methodName;
         var typeAndMethod = FileNameBuilder.GetTypeAndMethod(methodName, typeName, settings, pathInfo);
-        var parameterText = FileNameBuilder.GetParameterText(methodParameters, settings);
+        var (receivedParameters, verifiedParameters) = FileNameBuilder.GetParameterText(methodParameters, settings);
 
         var namer = settings.Namer;
 
@@ -59,11 +60,11 @@ public partial class InnerVerifier :
 
         if (settings.useUniqueDirectory)
         {
-            InitForDirectoryConvention(namer, typeAndMethod, parameterText);
+            InitForDirectoryConvention(namer, typeAndMethod, verifiedParameters);
         }
         else
         {
-            InitForFileConvention(namer, typeAndMethod, parameterText);
+            InitForFileConvention(namer, typeAndMethod, receivedParameters, verifiedParameters);
         }
     }
 
@@ -71,30 +72,86 @@ public partial class InnerVerifier :
     /// Initialize a new instance of the <see cref="InnerVerifier" /> class for verifying the entire file (not just a specific type)
     /// </summary>
     /// <remarks>This constructor is used by 3rd party clients</remarks>
-    public InnerVerifier(string sourceFile, VerifySettings settings)
-    {
-        Guard.AgainstEmpty(sourceFile);
-        this.settings = settings;
-        verifyHasBeenRun = true;
-        directory = ResolveDirectory(sourceFile, settings, new());
+    [Obsolete("Use InnerVerifier(string directory, string name, VerifySettings settings)", true)]
+    // ReSharper disable UnusedParameter.Local
+    public InnerVerifier(string sourceFile, VerifySettings settings) =>
+        throw new NotImplementedException();
+    // ReSharper restore UnusedParameter.Local
 
-        counter = StartCounter(settings);
+    /// <summary>
+    /// Initialize a new instance of the <see cref="InnerVerifier" /> class for verifying the entire file (not just a specific type)
+    /// </summary>
+    /// <remarks>This constructor is used by 3rd party clients</remarks>
+    public InnerVerifier(string directory, string name, VerifySettings? settings = null)
+    {
+        Guard.NotEmpty(directory);
+        Guard.NotEmpty(name);
+        if (settings == null)
+        {
+            this.settings = new();
+        }
+        else
+        {
+            if (settings.Directory != null ||
+                settings.fileName != null ||
+                settings.typeName != null ||
+                settings.methodName != null ||
+                settings.hashParameters ||
+                settings.parametersText != null ||
+                settings.useUniqueDirectory ||
+                settings.UseUniqueDirectorySplitMode == true)
+            {
+                throw new(
+                    $"""
+                     The following VerifySettings are not supported by this API:
+                       * {nameof(VerifySettings.UseDirectory)}
+                       * {nameof(VerifySettings.UseFileName)}
+                       * {nameof(VerifySettings.UseTypeName)}
+                       * {nameof(VerifySettings.UseMethodName)}
+                       * {nameof(VerifySettings.HashParameters)}
+                       * {nameof(VerifySettings.UseTextForParameters)}
+                       * {nameof(VerifySettings.UseUniqueDirectory)}
+                       * {nameof(VerifySettings.UseUniqueDirectorySplitMode)}
+                     """);
+            }
+
+            this.settings = settings;
+        }
+
+        verifyHasBeenRun = true;
+
+        this.directory = directory;
+
+        counter = StartCounter(this.settings);
 
         IoHelpers.CreateDirectory(directory);
 
-        ValidatePrefix(settings, directory);
+        var prefix = Path.Combine(directory, name);
+        ValidatePrefix(this.settings, prefix);
 
-        var withoutExtension = Path.GetFileNameWithoutExtension(sourceFile);
-        verifiedFiles = [Path.Combine(directory, $"{withoutExtension}.verified{Path.GetExtension(sourceFile)}")];
+        verifiedFiles = MatchingFileFinder.FindVerified(name, directory);
 
         getFileNames = target =>
             new(
                 target.Extension,
-                sourceFile,
-                Path.Combine(directory, $"{withoutExtension}.verified.{target.Extension}")
-            );
+                $"{prefix}.received.{target.Extension}",
+                $"{prefix}.verified.{target.Extension}");
 
-        getIndexedFileNames = (_, _) => throw new NotImplementedException();
+        getIndexedFileNames = (target, index) =>
+        {
+            if (target.Name is null)
+            {
+                return new(
+                    target.Extension,
+                    $"{prefix}#{index}.received.{target.Extension}",
+                    $"{prefix}#{index}.verified.{target.Extension}");
+            }
+
+            return new(
+                target.Extension,
+                $"{prefix}#{target.Name}.{index}.received.{target.Extension}",
+                $"{prefix}#{target.Name}.{index}.verified.{target.Extension}");
+        };
     }
 
     static Counter StartCounter(VerifySettings settings) =>
@@ -109,9 +166,9 @@ public partial class InnerVerifier :
             settings.namedDateTimeOffsets
         );
 
-    void InitForDirectoryConvention(Namer namer, string typeAndMethod, string parameters)
+    void InitForDirectoryConvention(Namer namer, string typeAndMethod, string verifiedParameters)
     {
-        var verifiedPrefix = PrefixForDirectoryConvention(namer, typeAndMethod, parameters);
+        var verifiedPrefix = PrefixForDirectoryConvention(namer, typeAndMethod, verifiedParameters);
 
         var directoryPrefix = Path.Combine(directory, verifiedPrefix);
 
@@ -161,7 +218,7 @@ public partial class InnerVerifier :
         }
     }
 
-    string PrefixForDirectoryConvention(Namer namer, string typeAndMethod, string parameters)
+    string PrefixForDirectoryConvention(Namer namer, string typeAndMethod, string verifiedParameters)
     {
         var uniquenessVerified = GetUniquenessVerified(PrefixUnique.SharedUniqueness(namer), namer);
 
@@ -175,16 +232,16 @@ public partial class InnerVerifier :
             return $"{typeAndMethod}{uniquenessVerified}";
         }
 
-        return $"{typeAndMethod}{parameters}{uniquenessVerified}";
+        return $"{typeAndMethod}{verifiedParameters}{uniquenessVerified}";
     }
 
     static bool ShouldUseUniqueDirectorySplitMode(VerifySettings settings) =>
         settings.UseUniqueDirectorySplitMode
             .GetValueOrDefault(VerifierSettings.UseUniqueDirectorySplitMode);
 
-    void InitForFileConvention(Namer namer, string typeAndMethod, string parameters)
+    void InitForFileConvention(Namer namer, string typeAndMethod, string receivedParameters, string verifiedParameters)
     {
-        var (receivedPrefix, verifiedPrefix) = PrefixForFileConvention(namer, typeAndMethod, parameters);
+        var (receivedPrefix, verifiedPrefix) = PrefixForFileConvention(namer, typeAndMethod, receivedParameters, verifiedParameters);
 
         var pathPrefixReceived = Path.Combine(directory, receivedPrefix);
         var pathPrefixVerified = Path.Combine(directory, verifiedPrefix);
@@ -195,25 +252,39 @@ public partial class InnerVerifier :
 
         getFileNames = target =>
         {
-            var suffix = target.Name is null ? "" : $"#{target.Name}";
+            if (target.Name is null)
+            {
+                return new(
+                    target.Extension,
+                    $"{pathPrefixReceived}.received.{target.Extension}",
+                    $"{pathPrefixVerified}.verified.{target.Extension}");
+            }
+
             return new(
                 target.Extension,
-                $"{pathPrefixReceived}{suffix}.received.{target.Extension}",
-                $"{pathPrefixVerified}{suffix}.verified.{target.Extension}");
+                $"{pathPrefixReceived}#{target.Name}.received.{target.Extension}",
+                $"{pathPrefixVerified}#{target.Name}.verified.{target.Extension}");
         };
         getIndexedFileNames = (target, index) =>
         {
-            var suffix = target.Name is null ? $"#{index}" : $"#{target.Name}.{index}";
+            if (target.Name is null)
+            {
+                return new(
+                    target.Extension,
+                    $"{pathPrefixReceived}#{index}.received.{target.Extension}",
+                    $"{pathPrefixVerified}#{index}.verified.{target.Extension}");
+            }
+
             return new(
                 target.Extension,
-                $"{pathPrefixReceived}{suffix}.received.{target.Extension}",
-                $"{pathPrefixVerified}{suffix}.verified.{target.Extension}");
+                $"{pathPrefixReceived}#{target.Name}.{index}.received.{target.Extension}",
+                $"{pathPrefixVerified}#{target.Name}.{index}.verified.{target.Extension}");
         };
 
         MatchingFileFinder.DeleteReceived(receivedPrefix, directory);
     }
 
-    (string receivedPrefix, string verifiedPrefix) PrefixForFileConvention(Namer namer, string typeAndMethod, string parameters)
+    (string receivedPrefix, string verifiedPrefix) PrefixForFileConvention(Namer namer, string typeAndMethod, string receivedParameters, string verifiedParameters)
     {
         var sharedUniqueness = PrefixUnique.SharedUniqueness(namer);
         var uniquenessVerified = GetUniquenessVerified(sharedUniqueness, namer);
@@ -233,13 +304,13 @@ public partial class InnerVerifier :
         if (settings.ignoreParametersForVerified)
         {
             return (
-                $"{typeAndMethod}{parameters}{sharedUniqueness}",
+                $"{typeAndMethod}{receivedParameters}{sharedUniqueness}",
                 $"{typeAndMethod}{uniquenessVerified}");
         }
 
         return (
-            $"{typeAndMethod}{parameters}{sharedUniqueness}",
-            $"{typeAndMethod}{parameters}{uniquenessVerified}");
+            $"{typeAndMethod}{receivedParameters}{sharedUniqueness}",
+            $"{typeAndMethod}{verifiedParameters}{uniquenessVerified}");
     }
 
     static UniquenessList GetUniquenessVerified(UniquenessList sharedUniqueness, Namer namer)

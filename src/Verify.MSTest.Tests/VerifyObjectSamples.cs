@@ -1,14 +1,10 @@
-﻿using Argon;
-
 // ReSharper disable NotAccessedField.Local
 
-namespace TheTests;
 // Non-nullable field is uninitialized
 #pragma warning disable CS8618
 
 [TestClass]
-public class VerifyObjectSamples :
-    VerifyBase
+public partial class VerifyObjectSamples
 {
     [TestMethod]
     public Task ScopedSerializer()

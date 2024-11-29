@@ -1,47 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48</TargetFrameworks>
-    <TargetFrameworks>net9.0;net8.0;net7.0;$(TargetFrameworks)</TargetFrameworks>
+    <TargetFrameworks>net9.0;net8.0;$(TargetFrameworks)</TargetFrameworks>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <PlatformTarget>x64</PlatformTarget>
     <NoWarn>$(NoWarn);CS8002</NoWarn>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.8.0" PrivateAssets="all" />
-    <PackageReference Include="InfoOf.Fody" Version="2.2.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="MarkdownSnippets.MsBuild" Version="27.0.2" PrivateAssets="all" />
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.0" PrivateAssets="all" />
-    <PackageReference Include="Xunit" Version="2.8.0" />
-    <PackageReference Include="ProjectDefaults" Version="1.0.127" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="MarkdownSnippets.MsBuild" PrivateAssets="all" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+    <PackageReference Include="Xunit" />
+    <PackageReference Include="ProjectDefaults" PrivateAssets="all" />
+
     <ProjectReference Include="..\TargetLibrary\TargetLibrary.csproj" />
     <ProjectReference Include="..\Verify.ClipboardAccept\Verify.ClipboardAccept.csproj" />
     <ProjectReference Include="..\Verify.SamplePlugin\Verify.SamplePlugin.csproj" />
     <ProjectReference Include="..\Verify.Xunit\Verify.Xunit.csproj" />
     <ProjectReference Include="..\Verify\Verify.csproj" />
+
     <None Update="sample*.*" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Binary*.*.txt" CopyToOutputDirectory="PreserveNewest" />
     <Folder Include="Naming\CustomDirectory\" />
     <None Update="sample.level1" CopyToOutputDirectory="PreserveNewest" />
     <None Update=".sample" CopyToOutputDirectory="PreserveNewest" />
     <None Update="sample.recursive" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="AutoVerify.DelegateFalse.received.txt">
-      <ParentFile>AutoVerify</ParentFile>
-      <DependentUpon>AutoVerify.cs</DependentUpon>
+    <None Update="InnerVerifyChecksTests\InnerVerifyChecksTests2.Invalid.verified.txt">
+      <ParentFile>InnerVerifyChecksTests</ParentFile>
+      <DependentUpon>InnerVerifyChecksTests2.cs</DependentUpon>
+    </None>
+    <None Update="InnerVerifyTests\sample.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework) != 'net7.0'">
+
+  <ItemGroup Condition="$(TargetFramework) != 'net8.0'">
     <Compile Remove="Wizard\WizardGen.cs" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
-  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageReference Include="System.Drawing.Common" Version="8.0.4" />
+    <PackageReference Include="System.Drawing.Common" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
   <Import Project="$(ProjectDir)..\Verify\buildTransitive\Verify.props" />
   <Import Project="$(ProjectDir)..\Verify\buildTransitive\Verify.targets" />
   <Import Project="$(ProjectDir)..\Verify.Xunit\buildTransitive\Verify.Xunit.props" />
+
 </Project>

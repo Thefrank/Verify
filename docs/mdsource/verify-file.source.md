@@ -12,8 +12,19 @@ An optional `info` parameter can be supplied to add more context to the test. Th
 snippet: VerifyFileWithInfo
 
 
+## Using a custom extension
+
+snippet: VerifyFileExtension
+
+
 ## Verify a file without using a unit test
 
 Use the functionality of VerifyTests outside of a unit test.
 
 snippet: VerifyFileWithoutUnitTest
+
+Result:
+
+```
+{targetDirectory}/sample.verified.txt
+```

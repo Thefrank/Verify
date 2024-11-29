@@ -70,6 +70,15 @@
 
     #endregion
 
+    [Fact]
+    public void NameExists()
+    {
+        Recording.Start();
+        Assert.False(Recording.NameExists("name"));
+        Recording.Add("name", "value");
+        Assert.True(Recording.NameExists("name"));
+    }
+
     #region RecordingScoped
 
     [Fact]

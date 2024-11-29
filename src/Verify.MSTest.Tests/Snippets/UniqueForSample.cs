@@ -1,10 +1,7 @@
-﻿namespace TheTests;
-
 #region UniqueForSampleMSTest
 
 [TestClass]
-public class UniqueForSample :
-    VerifyBase
+public partial class UniqueForSample
 {
     [TestMethod]
     public Task Runtime()

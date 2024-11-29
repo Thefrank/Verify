@@ -11,6 +11,11 @@ indent_style = space
 indent_size = 4
 charset = utf-8
 
+# Redundant accessor body
+resharper_redundant_accessor_body_highlighting = error
+
+# Replace with field keyword
+resharper_replace_with_field_keyword_highlighting = error
 
 # Declare types in namespaces
 dotnet_diagnostic.CA1050.severity = None
@@ -153,7 +158,7 @@ trim_trailing_whitespace = true
 csharp_preferred_modifier_order = public, private, protected, internal, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async:suggestion
 resharper_namespace_body = file_scoped
 dotnet_naming_rule.private_constants_rule.severity = warning
-dotnet_naming_rule.private_constants_rule.style = upper_camel_case_style
+dotnet_naming_rule.private_constants_rule.style = lower_camel_case_style
 dotnet_naming_rule.private_constants_rule.symbols = private_constants_symbols
 dotnet_naming_rule.private_instance_fields_rule.severity = warning
 dotnet_naming_rule.private_instance_fields_rule.style = lower_camel_case_style
@@ -162,7 +167,7 @@ dotnet_naming_rule.private_static_fields_rule.severity = warning
 dotnet_naming_rule.private_static_fields_rule.style = lower_camel_case_style
 dotnet_naming_rule.private_static_fields_rule.symbols = private_static_fields_symbols
 dotnet_naming_rule.private_static_readonly_rule.severity = warning
-dotnet_naming_rule.private_static_readonly_rule.style = upper_camel_case_style
+dotnet_naming_rule.private_static_readonly_rule.style = lower_camel_case_style
 dotnet_naming_rule.private_static_readonly_rule.symbols = private_static_readonly_symbols
 dotnet_naming_style.lower_camel_case_style.capitalization = camel_case
 dotnet_naming_style.upper_camel_case_style.capitalization = pascal_case
@@ -189,7 +194,7 @@ resharper_arrange_object_creation_when_type_evident_highlighting = error
 resharper_arrange_object_creation_when_type_not_evident_highlighting = error
 resharper_arrange_redundant_parentheses_highlighting = error
 resharper_arrange_static_member_qualifier_highlighting = error
-resharper_arrange_this_qualifier_highlighting = hint
+resharper_arrange_this_qualifier_highlighting = error
 resharper_arrange_type_member_modifiers_highlighting = none
 resharper_built_in_type_reference_style_for_member_access_highlighting = hint
 resharper_built_in_type_reference_style_highlighting = hint
@@ -200,7 +205,8 @@ resharper_field_can_be_made_read_only_local_highlighting = none
 resharper_merge_into_logical_pattern_highlighting = warning
 resharper_merge_into_pattern_highlighting = error
 resharper_method_has_async_overload_highlighting = warning
-resharper_partial_type_with_single_part_highlighting = error
+# because stop rider giving errors before source generators have run
+resharper_partial_type_with_single_part_highlighting = warning
 resharper_redundant_base_qualifier_highlighting = warning
 resharper_redundant_cast_highlighting = error
 resharper_redundant_empty_object_creation_argument_list_highlighting = error
@@ -209,6 +215,7 @@ resharper_redundant_name_qualifier_highlighting = error
 resharper_redundant_suppress_nullable_warning_expression_highlighting = error
 resharper_redundant_using_directive_highlighting = error
 resharper_redundant_verbatim_string_prefix_highlighting = error
+resharper_redundant_lambda_signature_parentheses_highlighting = error
 resharper_replace_substring_with_range_indexer_highlighting = warning
 resharper_suggest_var_or_type_built_in_types_highlighting = error
 resharper_suggest_var_or_type_elsewhere_highlighting = error
@@ -231,11 +238,11 @@ dotnet_style_predefined_type_for_locals_parameters_members = true:error
 dotnet_style_predefined_type_for_member_access = true:error
 
 # Suggest more modern language features when available
-dotnet_style_object_initializer = true:suggestion
-dotnet_style_collection_initializer = true:suggestion
-dotnet_style_coalesce_expression = false:suggestion
-dotnet_style_null_propagation = true:suggestion
-dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_object_initializer = true:error
+dotnet_style_collection_initializer = true:error
+dotnet_style_coalesce_expression = false:error
+dotnet_style_null_propagation = true:error
+dotnet_style_explicit_tuple_names = true:error
 
 # Prefer "var" everywhere
 csharp_style_var_for_built_in_types = true:error
@@ -299,6 +306,10 @@ resharper_braces_for_lock = required
 resharper_braces_for_fixed = required
 resharper_braces_for_for = required
 
+resharper_return_value_of_pure_method_is_not_used_highlighting = error
+
+resharper_all_underscore_local_parameter_name_highlighting = none
+
 # Xml files
 [*.{xml,config,nuspec,resx,vsixmanifest,csproj,targets,props,fsproj}]
 indent_size = 2
@@ -309,3 +320,13 @@ ij_xml_space_inside_empty_tag = true
 
 [*.json]
 indent_size = 2
+
+# Verify settings
+[*.{received,verified}.{txt,xml,json,md,sql,csv,html,md}]
+charset = "utf-8-bom"
+end_of_line = lf
+indent_size = unset
+indent_style = unset
+insert_final_newline = false
+tab_width = unset
+trim_trailing_whitespace = false

@@ -73,7 +73,7 @@ public class StreamTests
     [Fact]
     public async Task EmptyBinary()
     {
-        var exception = await Assert.ThrowsAsync<Exception>(() => Verify(Array.Empty<byte>(), "bin"));
+        var exception = await Assert.ThrowsAsync<Exception>(() => Verify([], "bin"));
         Assert.StartsWith("Empty data is not allowed. Path: ", exception.Message);
     }
 
@@ -120,16 +120,20 @@ public class StreamTests
             2,
             3,
             4
-        ]);
-        stream.Position = 2;
+        ])
+        {
+            Position = 2
+        };
         return Verify(stream);
     }
 
     [Fact]
     public Task StreamNotAtStartAsText()
     {
-        var stream = new MemoryStream("foo"u8.ToArray());
-        stream.Position = 2;
+        var stream = new MemoryStream("foo"u8.ToArray())
+        {
+            Position = 2
+        };
         return Verify(stream, "txt");
     }
 
@@ -188,6 +192,14 @@ public class StreamTests
     [Fact]
     public Task VerifyFilePath() =>
         VerifyFile("sample.txt");
+
+    #endregion
+
+    #region VerifyFileExtension
+
+    [Fact]
+    public Task VerifyFilePathWithExtension() =>
+        VerifyFile("sample.txt", extension: "csv");
 
     #endregion
 

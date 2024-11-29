@@ -5,7 +5,7 @@ public static partial class Verifier
 {
     static InnerVerifier BuildVerifier(string sourceFile, VerifySettings settings, bool useUniqueDirectory)
     {
-        Guard.AgainstBadSourceFile(sourceFile);
+        Guards.AgainstBadSourceFile(sourceFile);
         if (useUniqueDirectory)
         {
             settings.UseUniqueDirectory();
@@ -38,12 +38,12 @@ public static partial class Verifier
         Func<InnerVerifier, Task<VerifyResult>> verify,
         bool useUniqueDirectory = false)
     {
-        Guard.AgainstBadSourceFile(sourceFile);
+        Guards.AgainstBadSourceFile(sourceFile);
         return new(
             settings,
-            async verifySettings =>
+            async settings =>
             {
-                using var verifier = BuildVerifier(sourceFile, verifySettings, useUniqueDirectory);
+                using var verifier = BuildVerifier(sourceFile, settings, useUniqueDirectory);
                 return await verify(verifier);
             });
     }

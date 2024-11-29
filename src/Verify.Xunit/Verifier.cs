@@ -2,13 +2,9 @@
 
 public static partial class Verifier
 {
-    static InnerVerifier GetVerifier(VerifySettings settings, string sourceFile, bool useUniqueDirectory)
+    static InnerVerifier BuildVerifier(VerifySettings settings, string sourceFile, bool useUniqueDirectory)
     {
-        if (!UseVerifyAttribute.TryGet(out var method))
-        {
-            var fileName = Path.GetFileName(sourceFile);
-            throw new($"Expected to find a `[UseVerify]` on assembly. File: {fileName}.");
-        }
+        var method = UseVerifyAttribute.GetMethod();
 
         if (useUniqueDirectory)
         {
@@ -18,15 +14,13 @@ public static partial class Verifier
         var type = method.ReflectedType!;
         VerifierSettings.AssignTargetAssembly(type.Assembly);
 
-        var methodParameters = method.ParameterNames();
-
         var pathInfo = GetPathInfo(sourceFile, type, method);
         return new(
             sourceFile,
             settings,
             type.NameWithParent(),
             method.Name,
-            methodParameters,
+            method.ParameterNames(),
             pathInfo);
     }
 
@@ -67,13 +61,23 @@ public static partial class Verifier
         Func<InnerVerifier, Task<VerifyResult>> verify,
         bool useUniqueDirectory = false)
     {
-        Guard.AgainstBadSourceFile(sourceFile);
+        Guards.AgainstBadSourceFile(sourceFile);
         return new(
             settings,
-            async verifySettings =>
+            async settings =>
             {
-                using var verifier = GetVerifier(verifySettings, sourceFile, useUniqueDirectory);
-                return await verify(verifier);
+                using var verifier = BuildVerifier(settings, sourceFile, useUniqueDirectory);
+
+                //TODO: rest and replicate try in other projects
+                try
+                {
+                    return await verify(verifier);
+                }
+                catch (TargetInvocationException exception)
+                    when (exception.InnerException != null)
+                {
+                    throw exception.InnerException!;
+                }
             });
     }
 }

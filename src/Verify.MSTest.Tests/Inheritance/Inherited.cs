@@ -1,5 +1,3 @@
-﻿namespace TheTests;
-
 [TestClass]
 public class Inherited : Base
 {

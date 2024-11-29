@@ -142,6 +142,7 @@ public static partial class VerifierSettings
         scrubSolutionDir = true;
         sortPropertiesAlphabetically = false;
         sortJsonObjects = false;
+        scrubUserProfile = true;
         autoVerify = null;
         UniquePrefixDisabled = false;
         UseUniqueDirectorySplitMode = false;
@@ -157,19 +158,6 @@ public static partial class VerifierSettings
     }
 
     public static bool StrictJson { get; private set; }
-
-    internal static string TxtOrJson
-    {
-        get
-        {
-            if (StrictJson)
-            {
-                return "json";
-            }
-
-            return "txt";
-        }
-    }
 
     internal static bool scrubProjectDir = true;
 

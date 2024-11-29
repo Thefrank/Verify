@@ -12,7 +12,7 @@ snippet: ExplicitTargetsNunit
 
 ## Xunit
 
-snippet: ExplicitTargetsXunit
+snippet: ExplicitTargetsXunitV3
 
 
 ## Fixie
@@ -22,7 +22,12 @@ snippet: ExplicitTargetsFixie
 
 ## MsTest
 
-snippet: ExplicitTargetsMsTest
+snippet: ExplicitTargetsMSTest
+
+
+## TUnit
+
+snippet: ExplicitTargetsTUnit
 
 
 ## Result

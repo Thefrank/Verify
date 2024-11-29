@@ -1,6 +1,22 @@
 ﻿static class IoHelpers
 {
-    static readonly char[] Separators =
+    static IoHelpers()
+    {
+        DirectorySeparator = Path.DirectorySeparatorChar;
+        if (DirectorySeparator == '/')
+        {
+            AltDirectorySeparator = '\\';
+        }
+        else
+        {
+            AltDirectorySeparator = '/';
+        }
+    }
+
+    public static char DirectorySeparator { get; }
+    public static char AltDirectorySeparator { get; }
+
+    static readonly char[] separators =
     [
         '\\',
         '/'
@@ -117,6 +133,12 @@
     {
         stream.MoveToStart();
         using var reader = new StreamReader(stream);
+
+        return await ReadStringBuilderWithFixedLines(reader);
+    }
+
+    internal static async Task<StringBuilder> ReadStringBuilderWithFixedLines(TextReader reader)
+    {
         var contents = await reader.ReadToEndAsync();
         var builder = new StringBuilder(contents);
         if (contents.Contains('\r'))
@@ -127,23 +149,12 @@
         return builder;
     }
 
-#if NET472 || NET48
-    internal static void WriteText(string path, StringBuilder text)
-    {
-        CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, text.ToString(), VerifierSettings.Encoding);
-    }
-
-#else
-
     internal static void WriteText(string path, StringBuilder text)
     {
         CreateDirectory(Path.GetDirectoryName(path)!);
         using var writer = new StreamWriter(path, false, VerifierSettings.Encoding);
         writer.Write(text);
     }
-
-#endif
 
     public static string GetRelativePath(string directory, string file)
     {
@@ -191,7 +202,7 @@
     {
         var mappedFile = GetMappedBuildPath(sourceFile);
 
-        var index = mappedFile.LastIndexOfAny(Separators);
+        var index = mappedFile.LastIndexOfAny(separators);
         if (index > 0)
         {
             return mappedFile[..index];

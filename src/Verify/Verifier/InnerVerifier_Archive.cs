@@ -1,6 +1,4 @@
-﻿using System.IO.Compression;
-
-namespace VerifyTests;
+﻿namespace VerifyTests;
 
 partial class InnerVerifier
 {
@@ -8,34 +6,37 @@ partial class InnerVerifier
         string path,
         Func<ZipArchiveEntry, bool>? include,
         object? info,
-        FileScrubber? scrubber)
+        FileScrubber? scrubber,
+        bool includeStructure)
     {
         using var stream = File.OpenRead(path);
-        return await VerifyZip(stream, include, info, scrubber);
+        return await VerifyZip(stream, include, info, scrubber, includeStructure);
     }
 
     public async Task<VerifyResult> VerifyZip(
         Stream stream,
         Func<ZipArchiveEntry, bool>? include,
         object? info,
-        FileScrubber? scrubber)
+        FileScrubber? scrubber,
+        bool includeStructure)
     {
         using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
-        return await VerifyZip(archive, include, info, scrubber);
+        return await VerifyZip(archive, include, info, scrubber, includeStructure);
     }
 
     public async Task<VerifyResult> VerifyZip(
         ZipArchive archive,
         Func<ZipArchiveEntry, bool>? include,
         object? info,
-        FileScrubber? scrubber)
+        FileScrubber? scrubber,
+        bool includeStructure)
     {
         var targets = new List<Target>();
         if (info is not null)
         {
             targets.Add(
                 new(
-                    VerifierSettings.TxtOrJson,
+                    settings.TxtOrJson,
                     JsonFormatter.AsJson(
                         settings,
                         counter,
@@ -43,6 +44,11 @@ partial class InnerVerifier
         }
 
         include ??= _ => true;
+
+        if (includeStructure)
+        {
+            targets.Add(new("md", ZipStructure.Build(archive), "structure"));
+        }
 
         foreach (var entry in archive.Entries)
         {
@@ -62,7 +68,8 @@ partial class InnerVerifier
             var pathWithoutExtension = Path.Combine(fileDirectoryPath, fileNameWithoutExtension);
             // This is a case of file without filename contained inside a directory
             // so let's not mix directory name with filename
-            if (fileNameWithoutExtension.Length == 0 && pathWithoutExtension.Length != 0)
+            if (fileNameWithoutExtension.Length == 0 &&
+                pathWithoutExtension.Length != 0)
             {
                 pathWithoutExtension += Path.DirectorySeparatorChar;
             }

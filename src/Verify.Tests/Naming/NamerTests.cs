@@ -1,3 +1,4 @@
+// ReSharper disable ArrangeObjectCreationWhenTypeNotEvident
 public class NamerTests
 {
 #if NET6_0_OR_GREATER && DEBUG
@@ -183,15 +184,11 @@ public class NamerTests
     }
 
     [Fact]
-    public async Task UseFileNameFluent()
-    {
-        #region UseFileNameFluent
-
+    public async Task UseFileNameFluent() =>
+    #region UseFileNameFluent
         await Verify("valueUseFileNameFluent")
             .UseFileName("CustomFileNameFluent");
-
-        #endregion
-    }
+    #endregion
 
     [Fact]
     public async Task UseDirectory()
@@ -206,15 +203,12 @@ public class NamerTests
     }
 
     [Fact]
-    public async Task UseDirectoryFluent()
-    {
-        #region UseDirectoryFluent
-
+    public async Task UseDirectoryFluent() =>
+    #region UseDirectoryFluent
         await Verify("valueUseDirectoryFluent")
             .UseDirectory("CustomDirectory");
+    #endregion
 
-        #endregion
-    }
 
     [Fact]
     public async Task UseUniqueDirectory()
@@ -229,34 +223,20 @@ public class NamerTests
     }
 
     [Fact]
-    public async Task UseUniqueDirectoryFluent()
-    {
-        #region UseUniqueDirectoryFluent
-
+    public async Task UseUniqueDirectoryFluent() =>
+    #region UseUniqueDirectoryFluent
         await Verify("TheValue")
             .UseUniqueDirectory();
-
-        #endregion
-    }
+    #endregion
 
     [Fact]
     public Task UseUniqueDirectory_Target() =>
-        Verify(
-                "UseUniqueDirectory_Target",
-                new[]
-                {
-                    new Target("txt", "data")
-                })
+        Verify("UseUniqueDirectory_Target", [new("txt", "data")])
             .UseUniqueDirectory();
 
     [Fact]
     public Task UseUniqueDirectory_TargetWithName() =>
-        Verify(
-                "UseUniqueDirectory_Target",
-                new[]
-                {
-                    new Target("txt", "data", "name")
-                })
+        Verify("UseUniqueDirectory_Target", [new("txt", "data", "name")])
             .UseUniqueDirectory();
 
     [Fact]
@@ -301,7 +281,7 @@ public class NamerTests
     {
         var exception = await Assert.ThrowsAsync<Exception>(() => Verify("UseTooManyParameters")
             .UseParameters("param1", "param2"));
-        Assert.Equal("The number of passed in parameters (2) must be fewer than the number of parameters for the method (1).", exception.Message);
+        Assert.Equal("The number of passed in parameters (2) must not exceed the number of parameters for the method (1).", exception.Message);
     }
 
     [Fact]
@@ -317,15 +297,11 @@ public class NamerTests
     }
 
     [Fact]
-    public async Task UseTypeNameFluent()
-    {
-        #region UseTypeNameFluent
-
+    public async Task UseTypeNameFluent() =>
+    #region UseTypeNameFluent
         await Verify("valueUseTypeNameFluent")
             .UseTypeName("CustomTypeName");
-
-        #endregion
-    }
+    #endregion
 
     [Fact]
     public async Task UseMethodName()
@@ -340,15 +316,12 @@ public class NamerTests
     }
 
     [Fact]
-    public async Task UseMethodNameFluent()
-    {
-        #region UseMethodNameFluent
-
+    public async Task UseMethodNameFluent() =>
+    #region UseMethodNameFluent
         await Verify("valueUseMethodNameFluent")
             .UseMethodName("CustomMethodNameFluent");
+    #endregion
 
-        #endregion
-    }
 
     [Fact]
     public void AccessNamerRuntimeAndVersion()
@@ -405,41 +378,16 @@ public class NamerTests
             .UniqueForRuntimeAndVersion();
     }
 
-    #region UseTextForParameters
-
-    [Theory]
-    [InlineData("Value1")]
-    [InlineData("Value2")]
-    public Task UseTextForParameters(string arg)
-    {
-        var settings = new VerifySettings();
-        settings.UseTextForParameters(arg);
-        return Verify(arg + "UseTextForParameters", settings);
-    }
-
-    [Theory]
-    [InlineData("Value1")]
-    [InlineData("Value2")]
-    public Task UseTextForParametersFluent(string arg) =>
-        Verify(arg + "UseTextForParametersFluent")
-            .UseTextForParameters(arg);
-
-    #endregion
-
     [Fact]
     public Task UseTextForParametersNoParam() =>
         Verify("ValueUseTextForParametersNoParam")
             .UseTextForParameters("Suffix");
 
     [Fact]
-    public void AccessNamerArchitecture()
-    {
-        #region AccessNamerArchitecture
-
+    public void AccessNamerArchitecture() =>
+    #region AccessNamerArchitecture
         Debug.WriteLine(Namer.Architecture);
-
-        #endregion
-    }
+    #endregion
 
     [Fact]
     public Task Architecture()
@@ -477,26 +425,22 @@ public class NamerTests
         return Verify("contentMultipleParams", settings);
     }
 
-    #region IgnoreParametersForVerified
-
     [Theory]
     [InlineData("One")]
     [InlineData("Two")]
-    public Task IgnoreParametersForVerifiedWithArgs(string arg)
+    public Task IgnoreParametersForVerified(string arg)
     {
         var settings = new VerifySettings();
         settings.IgnoreParametersForVerified(arg);
-        return Verify("valueIgnoreParametersForVerifiedWithArgs", settings);
+        return Verify("value", settings);
     }
 
     [Theory]
     [InlineData("One")]
     [InlineData("Two")]
     public Task IgnoreParametersForVerifiedFluent(string arg) =>
-        Verify("valueIgnoreParametersForVerifiedFluent")
+        Verify("value")
             .IgnoreParametersForVerified(arg);
-
-    #endregion
 
     [Theory]
     [InlineData("One")]
@@ -512,55 +456,36 @@ public class NamerTests
             .UseParameters(value);
 
     [Fact]
-    public Task IgnoreParametersForVerified()
-    {
-        // note that this test 'generates' the same verified and received filenames as the parameterized method
-        var settings = new VerifySettings();
-        return Verify("valueIgnoreParametersForVerified", settings);
-    }
-
-    [Fact]
     public Task SingleTarget() =>
-        Verify(
-            new[]
-            {
-                new Target("txt", "data")
-            });
+        Verify([new Target("txt", "data")]);
 
     [Fact]
     public Task SingleTargetWithName() =>
-        Verify(
-            new[]
-            {
-                new Target("txt", "data", "theNameA")
-            });
+        Verify([new Target("txt", "data", "theNameA")]);
 
     [Fact]
     public Task MultipleTarget() =>
         Verify(
-            new[]
-            {
-                new Target("txt", "data"),
-                new Target("txt", "data")
-            });
+        [
+            new Target("txt", "data"),
+            new Target("txt", "data")
+        ]);
 
     [Fact]
     public Task MultipleTargetWithName() =>
         Verify(
-            new[]
-            {
-                new Target("txt", "data", "theNameA"),
-                new Target("txt", "data", "theNameB")
-            });
+        [
+            new Target("txt", "data", "theNameA"),
+            new Target("txt", "data", "theNameB")
+        ]);
 
     [Fact]
     public Task MultipleTargetWithDuplicateName() =>
         Verify(
-            new[]
-            {
-                new Target("txt", "data", "theNameA"),
-                new Target("txt", "data", "theNameA")
-            });
+        [
+            new Target("txt", "data", "theNameA"),
+            new Target("txt", "data", "theNameA")
+        ]);
 
     [Fact]
     public void DistinctUniquenessPrefixes()
@@ -587,23 +512,6 @@ public class NamerTests
     [Theory]
     [InlineData(true, false)]
     [InlineData(false, false)]
-    public Task UseHashedParameters(bool a, bool b)
-    {
-        var settings = new VerifySettings();
-        settings.UseHashedParameters(a, b);
-        return Verify("ContentUseParametersHash", settings);
-    }
-
-    [Theory]
-    [InlineData(true, false)]
-    [InlineData(false, false)]
-    public Task UseHashedParametersFluent(bool a, bool b) =>
-        Verify("ContentUseParametersHashFluent")
-            .UseHashedParameters(a, b);
-
-    [Theory]
-    [InlineData(true, false)]
-    [InlineData(false, false)]
     public Task HashParameters(bool a, bool b)
     {
         var settings = new VerifySettings();
@@ -617,6 +525,6 @@ public class NamerTests
     [InlineData(false, false)]
     public Task HashParametersFluent(bool a, bool b) =>
         Verify("ContentHashParametersFluent")
-            .UseHashedParameters(a, b)
+            .UseParameters(a, b)
             .HashParameters();
 }

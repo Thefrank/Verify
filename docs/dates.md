@@ -7,7 +7,6 @@ To change this file edit the source file and then run MarkdownSnippets.
 
 # Dates
 
-
 By default dates and times (`DateTime`, `DateTimeOffset`, `DateOnly`, and `TimeOnly`) are sanitized during verification. This is done by finding each date and taking a counter based that that specific date. That counter is then used replace the date values. This allows for repeatable tests when date values are changing.
 
 <!-- snippet: Date -->
@@ -30,7 +29,7 @@ var target = new DateTimeTarget
 
 await Verify(target);
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1091-L1110' title='Snippet source file'>snippet source</a> | <a href='#snippet-Date' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1044-L1063' title='Snippet source file'>snippet source</a> | <a href='#snippet-Date' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 Results in the following:
@@ -71,7 +70,7 @@ settings.DontScrubDateTimes();
 
 return Verify(target, settings);
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1733-L1745' title='Snippet source file'>snippet source</a> | <a href='#snippet-DontScrubDateTimes' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1683-L1695' title='Snippet source file'>snippet source</a> | <a href='#snippet-DontScrubDateTimes' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -88,7 +87,7 @@ var target = new
 return Verify(target)
     .DontScrubDateTimes();
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1751-L1761' title='Snippet source file'>snippet source</a> | <a href='#snippet-DontScrubDateTimesFluent' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1701-L1711' title='Snippet source file'>snippet source</a> | <a href='#snippet-DontScrubDateTimesFluent' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -101,13 +100,13 @@ return Verify(target)
 public static void ModuleInitializer() =>
     VerifierSettings.DontScrubDateTimes();
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1819-L1825' title='Snippet source file'>snippet source</a> | <a href='#snippet-DontScrubDateTimesGlobal' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1769-L1775' title='Snippet source file'>snippet source</a> | <a href='#snippet-DontScrubDateTimesGlobal' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
 ## DisableDateCounting
 
-If many calls are made to the the current date/time in quick succession, the date counting behavior (`DateTime_x`) can result in inconsistent results. To revert to the simpler scrubbing convention (`{Scrubbed}`) use DisableDateCounting.
+If many calls are made to the current date/time in quick succession, the date counting behavior (`DateTime_x`) can result in inconsistent results. To revert to the simpler scrubbing convention (`{Scrubbed}`) use DisableDateCounting.
 
 
 ### Instance
@@ -125,7 +124,7 @@ settings.DisableDateCounting();
 
 return Verify(target, settings);
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1780-L1792' title='Snippet source file'>snippet source</a> | <a href='#snippet-DisableDateCounting' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1730-L1742' title='Snippet source file'>snippet source</a> | <a href='#snippet-DisableDateCounting' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -142,7 +141,7 @@ var target = new
 return Verify(target)
     .DisableDateCounting();
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1798-L1808' title='Snippet source file'>snippet source</a> | <a href='#snippet-DisableDateCountingFluent' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1748-L1758' title='Snippet source file'>snippet source</a> | <a href='#snippet-DisableDateCountingFluent' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -155,7 +154,7 @@ return Verify(target)
 public static void ModuleInitializer() =>
     VerifierSettings.DisableDateCounting();
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1767-L1773' title='Snippet source file'>snippet source</a> | <a href='#snippet-DisableDateCountingGlobal' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1717-L1723' title='Snippet source file'>snippet source</a> | <a href='#snippet-DisableDateCountingGlobal' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -178,7 +177,7 @@ public Task WithExtraDateTimeFormat() =>
             date = "2022-11-08"
         });
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L146-L160' title='Snippet source file'>snippet source</a> | <a href='#snippet-AddExtraDateTimeFormat' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L45-L59' title='Snippet source file'>snippet source</a> | <a href='#snippet-AddExtraDateTimeFormat' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -202,7 +201,7 @@ public Task ScrubInlineDateTimesInstance()
         settings);
 }
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1703-L1715' title='Snippet source file'>snippet source</a> | <a href='#snippet-ScrubInlineDateTimesInstance' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1653-L1665' title='Snippet source file'>snippet source</a> | <a href='#snippet-ScrubInlineDateTimesInstance' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -216,7 +215,7 @@ public Task ScrubInlineDateTimesFluent() =>
     Verify("content 2020-10-20 content")
         .ScrubInlineDateTimes("yyyy-MM-dd");
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1694-L1701' title='Snippet source file'>snippet source</a> | <a href='#snippet-ScrubInlineDateTimesFluent' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1644-L1651' title='Snippet source file'>snippet source</a> | <a href='#snippet-ScrubInlineDateTimesFluent' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -232,7 +231,7 @@ public static class ModuleInitializer
         VerifierSettings.ScrubInlineDateTimes("yyyy-MM-dd");
 }
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1682-L1691' title='Snippet source file'>snippet source</a> | <a href='#snippet-ScrubInlineDateTimesGlobal' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1632-L1641' title='Snippet source file'>snippet source</a> | <a href='#snippet-ScrubInlineDateTimesGlobal' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -253,7 +252,7 @@ settings.AddNamedDateTime(new(2030, 1, 2), "instanceNamedDateTime");
 settings.AddNamedDateTimeOffset(new DateTime(2030, 1, 2), "instanceNamedTimeOffset");
 await Verify(target, settings);
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1273-L1282' title='Snippet source file'>snippet source</a> | <a href='#snippet-NamedDatesAndTimesInstance' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1226-L1235' title='Snippet source file'>snippet source</a> | <a href='#snippet-NamedDatesAndTimesInstance' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -268,7 +267,7 @@ await Verify(target)
     .AddNamedDateTime(new(2030, 1, 2), "instanceNamedDateTime")
     .AddNamedDateTimeOffset(new DateTime(2030, 1, 2), "instanceNamedTimeOffset");
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1230-L1238' title='Snippet source file'>snippet source</a> | <a href='#snippet-NamedDatesAndTimesFluent' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1183-L1191' title='Snippet source file'>snippet source</a> | <a href='#snippet-NamedDatesAndTimesFluent' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -286,5 +285,138 @@ public static void NamedDatesAndTimesGlobal()
     VerifierSettings.AddNamedDateTimeOffset(new(new(2030, 1, 1)), "namedDateTimeOffset");
 }
 ```
-<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1185-L1196' title='Snippet source file'>snippet source</a> | <a href='#snippet-NamedDatesAndTimesGlobal' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Serialization/SerializationTests.cs#L1138-L1149' title='Snippet source file'>snippet source</a> | <a href='#snippet-NamedDatesAndTimesGlobal' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+## Custom Comparers
+
+The following comparers can be overridden
+
+
+### DateTime
+
+Default Comparer:
+
+<!-- snippet: DateTimeComparer -->
+<a id='snippet-DateTimeComparer'></a>
+```cs
+class DateTimeComparer : IEqualityComparer<DateTime>
+{
+    public bool Equals(DateTime x, DateTime y) =>
+        x == y &&
+        x.Kind == y.Kind;
+
+    public int GetHashCode(DateTime obj) =>
+        obj.GetHashCode() + (int) obj.Kind;
+}
+```
+<sup><a href='/src/Verify/Counter_DateTime.cs#L15-L25' title='Snippet source file'>snippet source</a> | <a href='#snippet-DateTimeComparer' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+Custom Comparer:
+
+<!-- snippet: CustomDateTimeComparer -->
+<a id='snippet-CustomDateTimeComparer'></a>
+```cs
+[ModuleInitializer]
+public static void UseCustomDateTimeComparer() =>
+    Counter.UseDateTimeComparer(new CustomDateTimeComparer());
+
+public class CustomDateTimeComparer :
+    IEqualityComparer<DateTime>
+{
+    public bool Equals(DateTime x, DateTime y) =>
+        new DateTime(x.Year, x.Month, x.Day) ==
+        new DateTime(y.Year, y.Month, y.Day);
+
+    public int GetHashCode(DateTime date) =>
+        new DateTime(date.Year, date.Month, date.Day).GetHashCode();
+}
+```
+<sup><a href='/src/StaticSettingsTests/CustomDateCompareTests.cs#L4-L21' title='Snippet source file'>snippet source</a> | <a href='#snippet-CustomDateTimeComparer' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+### DateTimeOffset
+
+Default Comparer:
+
+<!-- snippet: DateTimeOffsetComparer -->
+<a id='snippet-DateTimeOffsetComparer'></a>
+```cs
+class DateTimeOffsetComparer :
+    IEqualityComparer<DateTimeOffset>
+{
+    public bool Equals(DateTimeOffset x, DateTimeOffset y) =>
+        x == y && x.Offset == y.Offset;
+
+    public int GetHashCode(DateTimeOffset obj) =>
+        obj.GetHashCode() + (int) obj.Offset.TotalMinutes;
+}
+```
+<sup><a href='/src/Verify/Counter_DateTimeOffset.cs#L15-L25' title='Snippet source file'>snippet source</a> | <a href='#snippet-DateTimeOffsetComparer' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+Custom Comparer:
+
+<!-- snippet: CustomDateTimeOffsetComparer -->
+<a id='snippet-CustomDateTimeOffsetComparer'></a>
+```cs
+[ModuleInitializer]
+public static void UseCustomDateTimeOffsetComparer() =>
+    Counter.UseDateTimeOffsetComparer(new CustomDateTimeOffsetComparer());
+
+public class CustomDateTimeOffsetComparer :
+    IEqualityComparer<DateTimeOffset>
+{
+    public bool Equals(DateTimeOffset x, DateTimeOffset y) =>
+        new DateTimeOffset(new(x.Year, x.Month, x.Day)) ==
+        new DateTimeOffset(new(y.Year, y.Month, y.Day));
+
+    public int GetHashCode(DateTimeOffset date)
+    {
+        var dateTime = new DateTime(date.Year, date.Month, date.Day);
+        return new DateTimeOffset(dateTime)
+            .GetHashCode();
+    }
+}
+```
+<sup><a href='/src/StaticSettingsTests/CustomDateCompareTests.cs#L42-L63' title='Snippet source file'>snippet source</a> | <a href='#snippet-CustomDateTimeOffsetComparer' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+### TimeOnly
+
+Default Comparer:
+
+<!-- snippet: TimeComparer -->
+<a id='snippet-TimeComparer'></a>
+```cs
+EqualityComparer<Time>.Default;
+```
+<sup><a href='/src/Verify/Counter_Time.cs#L14-L18' title='Snippet source file'>snippet source</a> | <a href='#snippet-TimeComparer' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+Custom Comparer:
+
+<!-- snippet: CustomTimeComparer -->
+<a id='snippet-CustomTimeComparer'></a>
+```cs
+[ModuleInitializer]
+public static void UseCustomTimeComparer() =>
+    Counter.UseTimeComparer(new CustomTimeComparer());
+
+public class CustomTimeComparer :
+    IEqualityComparer<Time>
+{
+    public bool Equals(Time x, Time y) =>
+        new Time(x.Hour, x.Minute, x.Second) ==
+        new Time(y.Hour, y.Minute, y.Second);
+
+    public int GetHashCode(Time date) =>
+        new Time(date.Hour, date.Minute, date.Second).GetHashCode();
+}
+```
+<sup><a href='/src/StaticSettingsTests/CustomDateCompareTests.cs#L23-L40' title='Snippet source file'>snippet source</a> | <a href='#snippet-CustomTimeComparer' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->

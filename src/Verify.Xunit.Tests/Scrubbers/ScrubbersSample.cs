@@ -1,6 +1,4 @@
-﻿#region ScrubbersSampleXunit
-
-public class ScrubbersSample
+﻿public class ScrubbersSample
 {
     [Fact]
     public Task Lines()
@@ -71,32 +69,6 @@ public class ScrubbersSample
             .ScrubLinesContaining(StringComparison.Ordinal, "H");
 
     [Fact]
-    public Task AfterSerialization()
-    {
-        var target = new ToBeScrubbed
-        {
-            RowVersion = "7D3"
-        };
-
-        var settings = new VerifySettings();
-        settings.AddScrubber(
-            _ => _.Replace("7D3", "TheRowVersion"));
-        return Verify(target, settings);
-    }
-
-    [Fact]
-    public Task AfterSerializationFluent()
-    {
-        var target = new ToBeScrubbed
-        {
-            RowVersion = "7D3"
-        };
-
-        return Verify(target)
-            .AddScrubber(_ => _.Replace("7D3", "TheRowVersion"));
-    }
-
-    [Fact]
     public Task RemoveOrReplace() =>
         Verify("""
                LineA
@@ -125,5 +97,3 @@ public class ScrubbersSample
                """)
             .ScrubEmptyLines();
 }
-
-#endregion

@@ -1,8 +1,5 @@
-﻿namespace TheTests;
-
 [TestClass]
-public class ParametersTests :
-    VerifyBase
+public partial class ParametersTests
 {
     //[DataTestMethod]
     //[DataRow("1.1")]

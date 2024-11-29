@@ -30,7 +30,7 @@ Use a [if: failure()](https://docs.github.com/en/free-pro-team@latest/actions/re
 ```yaml
 - name: Upload Test Results
   if: failure()
-  uses: actions/upload-artifact@v2
+  uses: actions/upload-artifact@v4
   with:
     name: verify-test-results
     path: |
@@ -51,7 +51,7 @@ Directly after the test runner step add a build step to set a flag if the testru
     script: 'echo ##vso[task.setvariable variable=publishverify]Yes'
 ```
 
-Since the PublishBuildArtifacts step in DevOps does not allow a wildcard it is necessary to need stage the 'received' files before publishing:
+Since the PublishBuildArtifacts step in DevOps does not allow a wildcard it is necessary to stage the 'received' files before publishing:
 
 ```yaml
 - task: CopyFiles@2
@@ -100,7 +100,7 @@ if (BuildServerDetector.Detected)
         });
 }
 ```
-<sup><a href='/src/Verify.Tests/Snippets/Snippets.cs#L56-L70' title='Snippet source file'>snippet source</a> | <a href='#snippet-DerivePathInfoAppVeyor' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Snippets/Snippets.cs#L45-L59' title='Snippet source file'>snippet source</a> | <a href='#snippet-DerivePathInfoAppVeyor' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 

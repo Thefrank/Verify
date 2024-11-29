@@ -1,0 +1,7 @@
+﻿{
+  withDefault: {},
+  withNonDefault: {
+    Name: Value,
+    DateTimeKind: Local
+  }
+}

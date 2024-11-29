@@ -11,22 +11,34 @@ The format is
 
 ## Directory
 
-The directory that contains the test. A custom directory can be used via `UseDirectory`:
+The directory that contains the test.
+
+The path provided can be absolute or relative to the directory that contains the test.
+
+
+### Instance
 
 snippet: UseDirectory
+
+
+### Fluent
 
 snippet: UseDirectoryFluent
 
 Will result in `CustomDirectory/TypeName.MethodName.verified.txt`.
-
-The path provided can be absolute or relative to the directory that contains the test.
 
 
 ## TestClassName
 
 The class name that contains the test. A custom test name can be used via `UseTypeName`:
 
+
+### Instance
+
 snippet: UseTypeName
+
+
+### Fluent
 
 snippet: UseTypeNameFluent
 
@@ -40,6 +52,9 @@ The test method name. A custom test name can be used via `UseMethodName`:
 snippet: UseMethodName
 
 Will result in `TestClass.CustomMethodName.verified.txt`.
+
+
+### Fluent
 
 snippet: UseMethodNameFluent
 
@@ -57,9 +72,15 @@ snippet: MultipleCalls
 
 To fully control the `{TestClassName}.{TestMethodName}_{Parameters}` parts of the file use `UseFileName`:
 
+
+### Instance
+
 snippet: UseFileName
 
 Will result in `CustomFileName.verified.txt`.
+
+
+### Fluent
 
 snippet: UseFileNameFluent
 
@@ -105,6 +126,11 @@ snippet: UniqueForSampleMSTest
 ### Expecto
 
 snippet: UniqueForSampleExpecto
+
+
+### TUnit
+
+snippet: UniqueForSampleTUnit
 
 
 ### Result
@@ -170,7 +196,7 @@ For example to place all `.verified.` files in a `{ProjectDirectory}\Snapshots` 
 
 ### Xunit
 
-snippet: DerivePathInfoXUnit
+snippet: DerivePathInfoXUnitV3
 
 
 ### NUnit
@@ -201,6 +227,8 @@ Where `NameWithParent` is
 
 snippet: NameWithParent
 
+Any path calculated in `DerivePathInfo` should be fully qualified to remove the inconsistency of the current directory.
+
 
 ### UseProjectRelativeDirectory
 
@@ -210,6 +238,17 @@ For example to place all `.verified.` files in a `{ProjectDirectory}\Snapshots` 
 
 ```
 Verifier.UseProjectRelativeDirectory("Snapshots");
+```
+
+
+### UseSourceFileRelativeDirectory
+
+`Verifier.UseSourceFileRelativeDirectory` is a wrapper around `DerivePathInfo` that stores all `.verified.` files in a directory relative to the source file directory.
+
+For example to place all `.verified.` files in a `{SourceFileDirectory}\Snapshots` the following could be used:
+
+```
+Verifier.UseSourceFileRelativeDirectory("Snapshots");
 ```
 
 
@@ -264,6 +303,54 @@ eg. add the following to `.gitignore`
 `*.received/`
 
 
-## Received and multi-targetting
+## Received and multi-targeting
 
-When a test project uses more than one `TargetFrameworks` (eg `<TargetFrameworks>net48;net7.0</TargetFrameworks>`) the runtime and version will be always be added as a uniqueness to the received file. This prevents file locking contenction when the tests from both target framework run in parallel.
+When a test project uses more than one `TargetFrameworks` (eg `<TargetFrameworks>net48;net7.0</TargetFrameworks>`) the runtime and version will be always be added as a uniqueness to the received file. This prevents file locking contention when the tests from both target framework run in parallel.
+
+
+## Orphaned verified files
+
+One problem with Verify is there is currently no way to track or clean up orphaned verified files.
+
+
+### Scenario
+
+Given the following test
+
+```
+[TestFixture]
+public class MyFixture
+{
+    [Test]
+    public Task MyTest1() => Verify("Value");
+}
+```
+
+The resulting verified file will be `MyFixture.MyTest1.verified.txt`
+
+Now the test is changed to
+
+```
+[TestFixture]
+public class MyFixture
+{
+    [Test]
+    public Task Test1() => Verify("Value");
+}
+```
+
+The new resulting verified file will be `MyFixture.Test1.verified.txt`.
+
+The old file, `MyFixture.MyTest1.verified.txt`, will be now orphaned and never be cleaned up.
+
+
+### Mitigation
+
+For small renames, with resulting small number of orphaned files, the recommended approach is to manually rename the verified files. Or alternatively:
+
+ * Delete the orphaned `*.verified.*` files.
+ * Run the test(s)
+ * Accept all changes using one of the [Snapshot management](https://github.com/VerifyTests/Verify?tab=readme-ov-file#snapshot-management) approaches.
+
+In some scenarios it may be necessary to clean up many orphaned files. For example from a rename of test fixture with many tests, or a test with many parameter permutations. In this case the delete can be performed by [DiffEngine Tray - Purge verified files
+](https://github.com/VerifyTests/DiffEngine/blob/main/docs/tray.md#purge-verified-files) feature.

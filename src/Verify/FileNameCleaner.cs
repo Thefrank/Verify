@@ -49,36 +49,12 @@
     static SearchValues<char> invalidFileNameSearchValues = SearchValues.Create(invalidFileNameChars);
 #endif
 
-    public static string ReplaceInvalidFileNameChars(this string value)
-    {
-        var span = value.AsSpan();
-
+    static int IndexOfInvalidChar(CharSpan span) =>
 #if NET8_0_OR_GREATER
-        var index = span.IndexOfAny(invalidFileNameSearchValues);
+        span.IndexOfAny(invalidFileNameSearchValues);
 #else
-        var index = span.IndexOfAny(invalidFileNameChars.AsSpan());
+        span.IndexOfAny(invalidFileNameChars.AsSpan());
 #endif
-
-        if (index == -1)
-        {
-            return value;
-        }
-
-        var chars = value.ToCharArray();
-        span[..index]
-            .CopyTo(chars);
-        chars[index] = '-';
-        index++;
-        for (; index < chars.Length; index++)
-        {
-            if (IsInvalid(chars[index]))
-            {
-                chars[index] = '-';
-            }
-        }
-
-        return new(chars);
-    }
 
     static bool IsInvalid(char ch) =>
 #if NET8_0_OR_GREATER
@@ -89,6 +65,15 @@
 
     public static void AppendValid(StringBuilder builder, string value)
     {
+        var span = value.AsSpan();
+        var index = IndexOfInvalidChar(span);
+
+        if (index == -1)
+        {
+            builder.Append(value);
+            return;
+        }
+
         foreach (var ch in value)
         {
             if (IsInvalid(ch))

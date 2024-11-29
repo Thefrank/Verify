@@ -4,7 +4,8 @@ namespace VerifyExpecto;
 
 public static partial class Verifier
 {
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         byte[]? target,
         string extension,
@@ -16,7 +17,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, extension, info));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         byte[]? target,
         VerifySettings? settings = null,
@@ -27,7 +29,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, info));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         Task<byte[]> target,
         string extension,
@@ -39,7 +42,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, extension, info));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         ValueTask<byte[]> target,
         string extension,
@@ -51,7 +55,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, extension, info));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         FileStream? target,
         VerifySettings? settings = null,
@@ -62,7 +67,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, info));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         Stream? target,
         VerifySettings? settings = null,
@@ -73,7 +79,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, info));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         Stream? target,
         string extension,
@@ -85,7 +92,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, extension, info));
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         Task<T> target,
         string extension,
@@ -98,7 +106,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, extension, info));
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         ValueTask<T> target,
         string extension,
@@ -111,7 +120,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.VerifyStream(target, extension, info));
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         IEnumerable<T> targets,
         string extension,

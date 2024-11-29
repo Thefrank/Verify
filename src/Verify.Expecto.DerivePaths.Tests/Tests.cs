@@ -12,8 +12,8 @@
                     Expect.isTrue(Directory.Exists(projectDirectory), "Directory.Exists(projectDirectory)");
                     Expect.isNotNull(methodName, "methodName");
                     Expect.isNotNull(typeName, "typeName");
-                    Expect.stringEnds("Verify.Xunit.DerivePaths.Tests/Tests.cs", sourceFile.Replace(@"\", "/"), "");
-                    Expect.stringEnds("Verify.Xunit.DerivePaths.Tests/", projectDirectory.Replace(@"\", "/"), "");
+                    Expect.stringEnds(sourceFile.Replace(@"\", "/"), "Verify.Expecto.DerivePaths.Tests/Tests.cs", "");
+                    Expect.stringEnds(projectDirectory.Replace(@"\", "/"), "Verify.Expecto.DerivePaths.Tests/", "");
                     return new("CustomDir", "CustomTypeName", "CustomMethodName");
                 });
             return Verify(
@@ -40,6 +40,17 @@
             UseProjectRelativeDirectory("Relative");
             return Verify(
                 name: nameof(ProjectRelativeDirectory),
+                target: "Value");
+        });
+
+    [Tests]
+    public static Test SourceFileRelativeDirectory = Runner.TestCase(
+        nameof(SourceFileRelativeDirectory),
+        () =>
+        {
+            UseSourceFileRelativeDirectory("Relative");
+            return Verify(
+                name: nameof(SourceFileRelativeDirectory),
                 target: "Value");
         });
 

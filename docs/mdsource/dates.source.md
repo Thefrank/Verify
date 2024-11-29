@@ -1,6 +1,5 @@
 # Dates
 
-
 By default dates and times (`DateTime`, `DateTimeOffset`, `DateOnly`, and `TimeOnly`) are sanitized during verification. This is done by finding each date and taking a counter based that that specific date. That counter is then used replace the date values. This allows for repeatable tests when date values are changing.
 
 snippet: Date
@@ -29,7 +28,7 @@ snippet: DontScrubDateTimesGlobal
 
 ## DisableDateCounting
 
-If many calls are made to the the current date/time in quick succession, the date counting behavior (`DateTime_x`) can result in inconsistent results. To revert to the simpler scrubbing convention (`{Scrubbed}`) use DisableDateCounting.
+If many calls are made to the current date/time in quick succession, the date counting behavior (`DateTime_x`) can result in inconsistent results. To revert to the simpler scrubbing convention (`{Scrubbed}`) use DisableDateCounting.
 
 
 ### Instance
@@ -92,3 +91,41 @@ snippet: NamedDatesAndTimesFluent
 ### Globally
 
 snippet: NamedDatesAndTimesGlobal
+
+
+## Custom Comparers
+
+The following comparers can be overridden
+
+
+### DateTime
+
+Default Comparer:
+
+snippet: DateTimeComparer
+
+Custom Comparer:
+
+snippet: CustomDateTimeComparer
+
+
+### DateTimeOffset
+
+Default Comparer:
+
+snippet: DateTimeOffsetComparer
+
+Custom Comparer:
+
+snippet: CustomDateTimeOffsetComparer
+
+
+### TimeOnly
+
+Default Comparer:
+
+snippet: TimeComparer
+
+Custom Comparer:
+
+snippet: CustomTimeComparer

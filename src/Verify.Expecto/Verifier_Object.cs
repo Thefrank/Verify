@@ -3,7 +3,8 @@ namespace VerifyExpecto;
 // ReSharper disable RedundantSuppressNullableWarningExpression
 public static partial class Verifier
 {
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         VerifySettings? settings = null,
         [CallerFilePath] string sourceFile = "")
@@ -12,7 +13,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.Verify());
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         Func<Task<T>> target,
         VerifySettings? settings = null,
@@ -22,7 +24,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.Verify(target()));
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         Task<T> target,
         VerifySettings? settings = null,
@@ -32,7 +35,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.Verify(target));
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         ValueTask<T> target,
         VerifySettings? settings = null,
@@ -42,7 +46,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.Verify(target));
     }
 
-    public static Task<VerifyResult> Verify<T>(
+    [Pure]
+    public static SettingsTask Verify<T>(
         string name,
         IAsyncEnumerable<T> target,
         VerifySettings? settings = null,
@@ -52,7 +57,8 @@ public static partial class Verifier
         return Verify(settings, assembly, sourceFile, name, _ => _.Verify(target));
     }
 
-    public static Task<VerifyResult> Verify(
+    [Pure]
+    public static SettingsTask Verify(
         string name,
         object? target,
         VerifySettings? settings = null,

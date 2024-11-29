@@ -1,4 +1,4 @@
-﻿public class ParametersSample
+public class ParametersSample
 {
     public static IEnumerable<object[]> GetDecimalData()
     {
@@ -7,6 +7,94 @@
             (decimal) 1.1
         ];
     }
+
+    #region IgnoreParametersForVerifiedXunit
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersForVerified(string arg)
+    {
+        var settings = new VerifySettings();
+        settings.IgnoreParametersForVerified(arg);
+        return Verify("value", settings);
+    }
+
+    #endregion
+
+    #region IgnoreParametersForVerifiedFluentXunit
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersForVerifiedFluent(string arg) =>
+        Verify("value")
+            .IgnoreParametersForVerified(arg);
+
+    #endregion
+
+    #region IgnoreParametersForVerifiedCustomParamsXunit
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersForVerifiedCustomParams(string arg)
+    {
+        var settings = new VerifySettings();
+        settings.IgnoreParametersForVerified($"Number{arg}");
+        return Verify("value", settings);
+    }
+
+    #endregion
+
+    #region IgnoreParametersForVerifiedCustomParamsFluentXunit
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersForVerifiedCustomParamsFluent(string arg) =>
+        Verify("value")
+            .IgnoreParametersForVerified($"Number{arg}");
+
+    #endregion
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParameters(string arg)
+    {
+        var settings = new VerifySettings();
+        settings.UseParameters(arg);
+        settings.IgnoreParameters(nameof(arg));
+        return Verify("value", settings);
+    }
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersFluent(string arg) =>
+        Verify("value")
+            .UseParameters(arg)
+            .IgnoreParameters(nameof(arg));
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersCustomParams(string arg)
+    {
+        var settings = new VerifySettings();
+        settings.UseParameters($"Number{arg}");
+        settings.IgnoreParameters(nameof(arg));
+        return Verify("value", settings);
+    }
+
+    [Theory]
+    [InlineData("One")]
+    [InlineData("Two")]
+    public Task IgnoreParametersCustomParamsFluent(string arg) =>
+        Verify("value")
+            .UseParameters(arg)
+            .IgnoreParameters(nameof(arg));
 
     [Theory]
     [MemberData(nameof(GetDecimalData))]
@@ -26,7 +114,7 @@
         Verify(arg)
             .UseParameters(arg);
 
-    #region xunitInlineData
+    #region InlineDataInstanceXunit
 
     [Theory]
     [InlineData("Value1")]
@@ -38,6 +126,10 @@
         return Verify(arg, settings);
     }
 
+    #endregion
+
+    #region InlineDataFluentXunit
+
     [Theory]
     [InlineData("Value1")]
     [InlineData("Value2")]
@@ -47,7 +139,7 @@
 
     #endregion
 
-    #region UseParameters
+    #region UseParametersXunit
 
     [Theory]
     [InlineData("Value1")]
@@ -61,7 +153,7 @@
 
     #endregion
 
-    #region UseParametersSubSet
+    #region UseParametersSubSetXunit
 
     [Theory]
     [InlineData("Value1", "Value2", "Value3")]
@@ -74,7 +166,7 @@
 
     #endregion
 
-    #region xunitMemberData
+    #region MemberDataInstanceXunit
 
     [Theory]
     [MemberData(nameof(GetData))]
@@ -85,11 +177,19 @@
         return Verify(arg, settings);
     }
 
+    #endregion
+
+    #region MemberDataFluentXunit
+
     [Theory]
     [MemberData(nameof(GetData))]
     public Task MemberDataUsageFluent(string arg) =>
         Verify(arg)
             .UseParameters(arg);
+
+    #endregion
+
+    #region MemberDataGetDataXunit
 
     public static IEnumerable<object[]> GetData()
     {
@@ -105,20 +205,28 @@
 
     #endregion
 
-    // #region xunitAutoFixture
-    //
-    // [Theory]
-    // [InlineAutoData(42)]
-    // public Task AutoFixtureUsage(int stable, string random1, string random2)
-    // {
-    //     var result = MethodBeingTested(stable, random1, random2);
-    //     return Verify(result)
-    //         .UseParameters(stable);
-    // }
-    //
-    // #endregion
-    //
-    // // ReSharper disable UnusedParameter.Local
-    // static int MethodBeingTested(int stable, string random1, string random2) =>
-    //     stable;
+    #region UseTextForParametersInstanceXunit
+
+    [Theory]
+    [InlineData("Value1")]
+    [InlineData("Value2")]
+    public Task UseTextForParameters(string arg)
+    {
+        var settings = new VerifySettings();
+        settings.UseTextForParameters(arg);
+        return Verify(arg + "UseTextForParameters", settings);
+    }
+
+    #endregion
+
+    #region UseTextForParametersFluentXunit
+
+    [Theory]
+    [InlineData("Value1")]
+    [InlineData("Value2")]
+    public Task UseTextForParametersFluent(string arg) =>
+        Verify(arg + "UseTextForParametersFluent")
+            .UseTextForParameters(arg);
+
+    #endregion
 }

@@ -116,11 +116,14 @@ snippet: ScrubbersSampleFixie
 snippet: ScrubbersSampleMSTest
 
 
+### TUnit
+
+snippet: ScrubbersSampleTUnit
+
+
 ### Results
 
 snippet: Verify.Xunit.Tests/Scrubbers/ScrubbersSample.Lines.verified.txt
-
-snippet: Verify.Xunit.Tests/Scrubbers/ScrubbersSample.AfterSerialization.verified.txt
 
 
 ## Scrubber levels
@@ -150,6 +153,11 @@ snippet: ScrubberLevelsSampleFixie
 ### MSTest
 
 snippet: ScrubberLevelsSampleMSTest
+
+
+### TUnit
+
+snippet: ScrubberLevelsSampleTUnit
 
 
 ### Result

@@ -50,18 +50,12 @@ public class TypeConverterTests
     public async Task WithStreamRequiringCleanup()
     {
         await File.WriteAllTextAsync(withStreamRequiringCleanupPath, "FileContent");
-        var target = new TargetForCleanup
-        {
-            Value = "line1"
-        };
+        var target = new TargetForCleanup("line1");
         await Verify(target);
         Assert.False(File.Exists(withStreamRequiringCleanupPath));
     }
 
-    class TargetForCleanup
-    {
-        public string Value { get; set; } = null!;
-    }
+    public record TargetForCleanup(string Value);
 
     [ModuleInitializer]
     public static void ConvertWithNewlineInit() =>
@@ -71,17 +65,11 @@ public class TypeConverterTests
     [Fact]
     public Task ConvertWithNewline()
     {
-        var target = new ClassToSplit
-        {
-            Value = $"line1{Environment.NewLine}line2"
-        };
+        var target = new ClassToSplit($"line1{Environment.NewLine}line2");
         return Verify(target);
     }
 
-    public class ClassToSplit
-    {
-        public string Value { get; set; } = null!;
-    }
+    public record ClassToSplit(string Value);
 
     [ModuleInitializer]
     public static void ConvertWithCanConvert_InvalidInit() =>
@@ -92,10 +80,7 @@ public class TypeConverterTests
     [Fact]
     public Task ConvertWithCanConvert_Invalid()
     {
-        var target = new CanConvertTarget
-        {
-            Value = "Invalid"
-        };
+        var target = new CanConvertTarget("Invalid");
         return Verify(target);
     }
 
@@ -108,17 +93,11 @@ public class TypeConverterTests
     [Fact]
     public Task ConvertWithCanConvert_Valid()
     {
-        var target = new CanConvertTarget
-        {
-            Value = "Valid"
-        };
+        var target = new CanConvertTarget("Valid");
         return Verify(target);
     }
 
-    class CanConvertTarget
-    {
-        public string Value { get; set; } = null!;
-    }
+    record CanConvertTarget(string Value);
 
     [ModuleInitializer]
     public static void WithInfoInit() =>
@@ -188,9 +167,9 @@ public class TypeConverterTests
                 context.ContainsKey("name") &&
                 (string) context["name"] == nameof(TypeConversion) &&
                 Equals(target.RawFormat, ImageFormat.Bmp),
-            conversion: (bitmap1, _) =>
+            conversion: (bitmap, _) =>
             {
-                var streams = ConvertBmpTpPngStreams(bitmap1);
+                var streams = ConvertBmpTpPngStreams(bitmap);
                 return new ConversionResult(null, streams.Select(_ => new Target("png", _)));
             });
 

@@ -1,10 +1,7 @@
-﻿namespace TheTests;
-
 #region SampleTestMSTest
 
 [TestClass]
-public class Sample :
-    VerifyBase
+public partial class Sample
 {
     [TestMethod]
     public Task Test()

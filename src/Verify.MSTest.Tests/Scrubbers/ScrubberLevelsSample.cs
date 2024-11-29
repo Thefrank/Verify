@@ -1,10 +1,7 @@
-﻿namespace TheTests;
-
 #region ScrubberLevelsSampleMSTest
 
 [TestClass]
-public class ScrubberLevelsSample :
-    VerifyBase
+public partial class ScrubberLevelsSample
 {
     VerifySettings classLevelSettings;
 

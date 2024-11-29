@@ -15,15 +15,24 @@ snippet: mstest-nugets
 include: implicit-usings
 
 
-## Source Control
+## Conventions
 
-### Includes/Excludes
+
+### Source Control Includes/Excludes
 
 include: include-exclude
+
 
 ### Text file settings
 
 include: text-file-settings
+
+
+### Conventions check
+
+Conventions can be checked by calling `VerifyChecks.Run()` in a test
+
+snippet: VerifyChecksMSTest
 
 
 ## DiffEngineTray
@@ -65,6 +74,11 @@ public static void Initialize() =>
 ## Sample Test
 
 snippet: SampleTestMSTest
+
+
+### Marking tests as 'Using Verify'
+
+include: mstest-marker
 
 ## Diff Tool
 

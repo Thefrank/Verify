@@ -16,6 +16,10 @@ public static partial class Recording
         CurrentState()
             .Add(name, item);
 
+    public static bool NameExists(string name) =>
+        CurrentState()
+            .Items.Any(_ => _.Name == name);
+
     public static void TryAdd(string name, object item)
     {
         var value = asyncLocal.Value;
@@ -58,6 +62,30 @@ public static partial class Recording
         return true;
     }
 
+    public static IReadOnlyCollection<ToAppend> Values()
+    {
+        if (TryGetValues(out var values))
+        {
+            return values;
+        }
+
+        throw new("Recording.Start must be called prior to Recording.Values.");
+    }
+
+    public static bool TryGetValues([NotNullWhen(true)] out IReadOnlyCollection<ToAppend>? recorded)
+    {
+        var value = asyncLocal.Value;
+
+        if (value == null)
+        {
+            recorded = null;
+            return false;
+        }
+
+        recorded = value.Items;
+        return true;
+    }
+
     static State CurrentState([CallerMemberName] string caller = "")
     {
         var value = asyncLocal.Value;
@@ -94,6 +122,13 @@ public static partial class Recording
         CurrentState()
             .Pause();
 
+    public static bool IsPaused()
+    {
+        var value = asyncLocal.Value;
+
+        return value is {Paused: true};
+    }
+
     public static void TryPause() =>
         asyncLocal.Value?.Pause();
 
@@ -124,7 +159,7 @@ public static partial class Recording
             }
             else
             {
-                dictionary[value.Name] = objects = new();
+                dictionary[value.Name] = objects = [];
             }
 
             objects.Add(value.Data);

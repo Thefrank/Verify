@@ -1,34 +1,20 @@
-﻿namespace TheTests;
-
-#region UseParametersHashNunit
-
-[TestFixture]
+﻿[TestFixture]
 public class ParametersHashSample
 {
-    [TestCase("Value1")]
-    [TestCase("Value2")]
-    public Task UseHashedParametersUsage(string arg)
-    {
-        var settings = new VerifySettings();
-        settings.UseHashedParameters(arg);
-        return Verify(arg, settings);
-    }
-
-    [TestCase("Value1")]
-    [TestCase("Value2")]
-    public Task UseHashedParametersUsageFluent(string arg) =>
-        Verify(arg)
-            .UseHashedParameters(arg);
+    #region UseParametersHashInstanceNunit
 
     [TestCase("Value1")]
     [TestCase("Value2")]
     public Task HashParametersUsage(string arg)
     {
         var settings = new VerifySettings();
-        settings.UseParameters(arg);
         settings.HashParameters();
         return Verify(arg, settings);
     }
+
+    #endregion
+
+    #region UseParametersHashFluentNunit
 
     [TestCase("Value1")]
     [TestCase("Value2")]
@@ -36,20 +22,5 @@ public class ParametersHashSample
         Verify(arg)
             .HashParameters();
 
-    [TestCase("Value1")]
-    [TestCase("Value2")]
-    public Task HashParametersOmitPassingParameters(string arg)
-    {
-        var settings = new VerifySettings();
-        settings.HashParameters();
-        return Verify(arg, settings);
-    }
-
-    [TestCase("Value1")]
-    [TestCase("Value2")]
-    public Task HashParametersOmitPassingParametersFluent(string arg) =>
-        Verify(arg)
-            .HashParameters();
+    #endregion
 }
-
-#endregion

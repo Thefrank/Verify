@@ -1,4 +1,5 @@
-﻿namespace VerifyNUnit;
+#pragma warning disable VerifySetParameters
+namespace VerifyNUnit;
 
 public static partial class Verifier
 {
@@ -16,7 +17,7 @@ public static partial class Verifier
 
     static InnerVerifier BuildVerifier(string sourceFile, VerifySettings settings, bool useUniqueDirectory)
     {
-        Guard.AgainstBadSourceFile(sourceFile);
+        Guards.AgainstBadSourceFile(sourceFile);
         if (useUniqueDirectory)
         {
             settings.UseUniqueDirectory();
@@ -24,32 +25,23 @@ public static partial class Verifier
 
         var adapter = TestContext.CurrentContext.Test;
 
-        var testMethod = adapter.Method;
-        if (testMethod is null)
-        {
-            throw new("TestContext.CurrentContext.Test.Method is null. Verify can only be used from within a test method.");
-        }
-
-        if (!settings.HasParameters &&
-            adapter.Arguments.Length > 0)
-        {
-#pragma warning disable VerifySetParameters
-            settings.SetParameters(adapter.Arguments);
-#pragma warning restore
-        }
-
-        var customName = !adapter.FullName.StartsWith($"{testMethod.TypeInfo.FullName}.{testMethod.Name}");
-        if (customName)
-        {
-            settings.typeName ??= adapter.GetTypeName();
-
-            settings.methodName ??= adapter.GetMethodName();
-        }
-
-        var type = testMethod.TypeInfo.Type;
-        VerifierSettings.AssignTargetAssembly(type.Assembly);
+        var testMethod = adapter.GetTestMethod();
 
         var method = testMethod.MethodInfo;
+        var type = testMethod.TypeInfo.Type;
+
+        IReadOnlyList<string>? parameterNames;
+        if (settings.HasParameters)
+        {
+            parameterNames = GetParameterNames(method, adapter);
+        }
+        else
+        {
+            (parameterNames, var parameters) = GetParametersAndNames(method, adapter);
+            settings.SetParameters(parameters);
+        }
+
+        VerifierSettings.AssignTargetAssembly(type.Assembly);
 
         var pathInfo = GetPathInfo(sourceFile, type, method);
         return new(
@@ -57,38 +49,60 @@ public static partial class Verifier
             settings,
             type.NameWithParent(),
             method.Name,
-            method.ParameterNames(),
+            parameterNames,
             pathInfo);
     }
 
-    static string GetMethodName(this TestContext.TestAdapter adapter)
+    static IReadOnlyList<string>? GetParameterNames(MethodInfo method, TestAdapter adapter)
     {
-        var name = adapter.Name;
-        var indexOf = name.IndexOf('(');
-
-        if (indexOf != -1)
-        {
-            name = name[..indexOf];
-        }
-
-        return name.ReplaceInvalidFileNameChars();
+        var methodParameterNames = method.ParameterNames();
+        return adapter.GetParameterNames(methodParameterNames);
     }
 
-    static string GetTypeName(this TestContext.TestAdapter adapter)
+    static (IReadOnlyList<string>? names, object?[] parameters) GetParametersAndNames(MethodInfo method, TestAdapter adapter)
     {
-        var fullName = adapter.FullName;
-        var fullNameLength = fullName.Length - (adapter.Name.Length + 1);
-        var typeName = fullName[..fullNameLength];
-        var typeInfo = adapter.Method!.TypeInfo;
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if (typeInfo.Namespace is not null)
+        var methodParameterNames = method.ParameterNames();
+        var parameterNames = adapter.GetParameterNames(methodParameterNames);
+        if (!adapter.TryGetParent(out var parent))
         {
-            typeName = typeName[(typeInfo.Namespace.Length + 1)..];
+            return (parameterNames, adapter.Arguments);
         }
 
-        return typeName
-            .Remove("\"")
-            .ReplaceInvalidFileNameChars();
+        var argumentsLength = parent.Arguments.Length;
+        if (argumentsLength == 0)
+        {
+            return (parameterNames, adapter.Arguments);
+        }
+
+        if (methodParameterNames == null)
+        {
+            return (parameterNames, parent.Arguments);
+        }
+
+        return (
+            parameterNames,
+            [.. parent.Arguments, .. adapter.Arguments]);
+    }
+
+    static object?[] GetParameters(TestAdapter adapter, IReadOnlyList<string>? methodParameterNames)
+    {
+        if (!adapter.TryGetParent(out var parent))
+        {
+            return adapter.Arguments;
+        }
+
+        var argumentsLength = parent.Arguments.Length;
+        if (argumentsLength == 0)
+        {
+            return adapter.Arguments;
+        }
+
+        if (methodParameterNames == null)
+        {
+            return parent.Arguments;
+        }
+
+        return [.. parent.Arguments, .. adapter.Arguments];
     }
 
     static SettingsTask Verify(
@@ -97,7 +111,7 @@ public static partial class Verifier
         Func<InnerVerifier, Task<VerifyResult>> verify,
         bool useUniqueDirectory = false)
     {
-        Guard.AgainstBadSourceFile(sourceFile);
+        Guards.AgainstBadSourceFile(sourceFile);
         return new(
             settings,
             async verifySettings =>

@@ -1,6 +1,6 @@
-﻿[TestClass]
-public class Tests :
-    VerifyBase
+[TestClass]
+[UsesVerify]
+public partial class Tests
 {
     [TestMethod]
     public Task Test()
@@ -34,6 +34,13 @@ public class Tests :
     public Task ProjectRelativeDirectory()
     {
         UseProjectRelativeDirectory("Relative");
+        return Verify("Value");
+    }
+
+    [TestMethod]
+    public Task SourceFileRelativeDirectory()
+    {
+        UseSourceFileRelativeDirectory("Relative");
         return Verify("Value");
     }
 

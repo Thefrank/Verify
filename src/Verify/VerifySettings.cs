@@ -2,6 +2,19 @@ namespace VerifyTests;
 
 public partial class VerifySettings
 {
+    internal string TxtOrJson
+    {
+        get
+        {
+            if (VerifierSettings.StrictJson || strictJson)
+            {
+                return "json";
+            }
+
+            return "txt";
+        }
+    }
+
     public VerifySettings(VerifySettings? settings)
     {
         if (settings is null)
@@ -15,6 +28,7 @@ public partial class VerifySettings
         diffEnabled = settings.diffEnabled;
         methodName = settings.methodName;
         typeName = settings.typeName;
+        strictJson = settings.strictJson;
         appendedFiles = settings.appendedFiles;
         useUniqueDirectory = settings.useUniqueDirectory;
         Directory = settings.Directory;
@@ -23,6 +37,7 @@ public partial class VerifySettings
         stringComparer = settings.stringComparer;
         streamComparer = settings.streamComparer;
         parameters = settings.parameters;
+        ignoredParameters = settings.ignoredParameters;
         ignoreParametersForVerified = settings.ignoreParametersForVerified;
         hashParameters = settings.hashParameters;
         parametersText = settings.parametersText;
@@ -30,6 +45,13 @@ public partial class VerifySettings
         UniquePrefixDisabled = settings.UniquePrefixDisabled;
         UseUniqueDirectorySplitMode = settings.UseUniqueDirectorySplitMode;
         Namer = new(settings.Namer);
+#if NET6_0_OR_GREATER
+        namedDates = new(settings.namedDates);
+        namedTimes = new(settings.namedTimes);
+#endif
+        namedGuids = new(settings.namedGuids);
+        namedDateTimes = new(settings.namedDateTimes);
+        namedDateTimeOffsets = new(settings.namedDateTimeOffsets);
         foreach (var append in settings.Appends)
         {
             if (append.Data is ICloneable cloneable)
@@ -73,7 +95,7 @@ public partial class VerifySettings
     /// </summary>
     public void UseTextForParameters(string parametersText)
     {
-        Guard.AgainstBadExtension(parametersText);
+        Guards.AgainstBadExtension(parametersText);
 
         if (parameters is not null)
         {

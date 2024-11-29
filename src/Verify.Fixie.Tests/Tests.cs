@@ -1,30 +1,24 @@
 ﻿// ReSharper disable UnusedParameter.Local
 
+// ReSharper disable ArrangeObjectCreationWhenTypeNotEvident
 public class Tests
 {
     // ReSharper disable once UnusedMember.Local
-    void DerivePathInfo()
-    {
-        #region DerivePathInfoFixie
+    void DerivePathInfo() =>
+    #region DerivePathInfoFixie
 
         Verifier.DerivePathInfo(
             (sourceFile, projectDirectory, type, method) => new(
                 directory: Path.Combine(projectDirectory, "Snapshots"),
                 typeName: type.Name,
                 methodName: method.Name));
+    #endregion
 
-        #endregion
-    }
 
     [TestCase("Value1")]
     public Task UseFileNameWithParam(string arg) =>
         Verify(arg)
             .UseFileName("UseFileNameWithParam");
-
-    [TestCase("Value1")]
-    public Task UseTextForParameters(string arg) =>
-        Verify(arg)
-            .UseTextForParameters("TextForParameter");
 
     public Task StringTarget() =>
         Verify(new Target("txt", "Value"));
@@ -37,27 +31,25 @@ public class Tests
             {
                 Property = "Value"
             },
-            new[]
-            {
-                new Target(
+            [
+                new(
                     extension: "txt",
                     data: "Raw target value",
                     name: "targetName")
-            });
+            ]);
 
     #endregion
 
     public Task EnumerableTargets() =>
         Verify(
-            new[]
-            {
-                new Target(
+        [
+            new Target(
                     extension: "txt",
                     data: "Raw target value",
                     name: "targetName")
-            });
+        ]);
 
-#if DEBUG
+#if NET9_0
     static string directoryPathToVerify = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify");
     static string pathToArchive = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify.zip");
 
@@ -72,6 +64,13 @@ public class Tests
 
     public Task WithZip() =>
         VerifyZip(pathToArchive);
+
+    #endregion
+
+    #region VerifyZipWithStructureFixie
+
+    public Task WithZipAndStructure() =>
+        VerifyZip(pathToArchive, includeStructure: true);
 
     #endregion
 

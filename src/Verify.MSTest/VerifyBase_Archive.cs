@@ -1,9 +1,9 @@
-﻿using System.IO.Compression;
-
 namespace VerifyMSTest;
 
-public partial class VerifyBase
+partial class VerifyBase
 {
+#pragma warning disable CA1822 // Mark members as static
+
     /// <summary>
     /// Verifies the contents of a <see cref="ZipArchive" />
     /// </summary>
@@ -14,8 +14,9 @@ public partial class VerifyBase
         VerifySettings? settings = null,
         object? info = null,
         FileScrubber? fileScrubber = null,
+        bool includeStructure = false,
         [CallerFilePath] string sourceFile = "") =>
-        Verify(settings, sourceFile, _ => _.VerifyZip(archive, include, info, fileScrubber), true);
+        Verifier.Verify(archive, include, settings, info, fileScrubber, includeStructure, sourceFile);
 
     /// <summary>
     /// Verifies the contents of a <see cref="ZipArchive" />
@@ -27,8 +28,9 @@ public partial class VerifyBase
         VerifySettings? settings = null,
         object? info = null,
         FileScrubber? fileScrubber = null,
+        bool includeStructure = false,
         [CallerFilePath] string sourceFile = "") =>
-        Verify(settings, sourceFile, _ => _.VerifyZip(path, include, info, fileScrubber), true);
+        Verifier.VerifyZip(path, include, settings, info, fileScrubber, includeStructure, sourceFile);
 
     /// <summary>
     /// Verifies the contents of a <see cref="ZipArchive" />
@@ -40,6 +42,7 @@ public partial class VerifyBase
         VerifySettings? settings = null,
         object? info = null,
         FileScrubber? fileScrubber = null,
+        bool includeStructure = false,
         [CallerFilePath] string sourceFile = "") =>
-        Verify(settings, sourceFile, _ => _.VerifyZip(stream, include, info, fileScrubber), true);
+        Verifier.VerifyZip(stream, include, settings, info, fileScrubber, includeStructure, sourceFile);
 }

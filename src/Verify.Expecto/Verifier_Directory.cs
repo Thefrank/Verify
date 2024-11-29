@@ -9,7 +9,8 @@ public static partial class Verifier
     /// <summary>
     /// Verifies the contents of <paramref name="path" />.
     /// </summary>
-    public static Task<VerifyResult> VerifyDirectory(
+    [Pure]
+    public static SettingsTask VerifyDirectory(
         string name,
         string path,
         Func<string, bool>? include = null,
@@ -28,7 +29,8 @@ public static partial class Verifier
     /// Verifies the contents of <paramref name="path" />.
     /// Differs from passing <see cref="DirectoryInfo" /> to <code>Verify(object target)</code> which will verify the full path.
     /// </summary>
-    public static Task<VerifyResult> VerifyDirectory(
+    [Pure]
+    public static SettingsTask VerifyDirectory(
         string name,
         DirectoryInfo path,
         Func<string, bool>? include = null,
@@ -44,7 +46,8 @@ public static partial class Verifier
     /// <summary>
     /// Verifies the contents of <paramref name="path"/>.
     /// </summary>
-    public static Task<VerifyResult> VerifyDirectory(
+    [Pure]
+    public static SettingsTask VerifyDirectory(
         string name,
         string path,
         Func<string, bool>? include = null,
@@ -63,7 +66,8 @@ public static partial class Verifier
     /// Verifies the contents of <paramref name="path"/>.
     /// Differs from passing <see cref="DirectoryInfo"/> to <code>Verify(object target)</code> which will verify the full path.
     /// </summary>
-    public static Task<VerifyResult> VerifyDirectory(
+    [Pure]
+    public static SettingsTask VerifyDirectory(
         string name,
         DirectoryInfo path,
         Func<string, bool>? include = null,

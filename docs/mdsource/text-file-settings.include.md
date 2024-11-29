@@ -7,7 +7,7 @@ Text variants of verified and received have the following characteristics:
 This manifests in several ways:
 
 
-**Source control settings**
+#### Source control settings
 
 All text extensions of `*.verified.*` should have:
 
@@ -22,13 +22,14 @@ eg add the following to `.gitattributes`
 *.verified.json text eol=lf working-tree-encoding=UTF-8
 ```
 
-**EditorConfig settings**
+
+#### EditorConfig settings
 
 If modifying text verified/received files in an editor, it is desirable for the editor to respect the above conventions. For [EditorConfig](https://editorconfig.org/) enabled the following can be used:
 
 ```
 # Verify settings
-[*.{received,verified}.{txt,xml,json}]
+[*.{received,verified}.{json,txt,xml}]
 charset = "utf-8-bom"
 end_of_line = lf
 indent_size = unset
@@ -38,5 +39,4 @@ tab_width = unset
 trim_trailing_whitespace = false
 ```
 
-
-*Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.*
+**Note that the above are suggested for subset of text extension. Add others as required based on the text file types being verified.**

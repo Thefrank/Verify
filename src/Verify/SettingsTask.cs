@@ -1,8 +1,7 @@
-﻿namespace VerifyTests;
+namespace VerifyTests;
 
 public partial class SettingsTask
 {
-    VerifySettings? settings;
     Func<VerifySettings, Task<VerifyResult>> buildTask;
     Task<VerifyResult>? task;
 
@@ -10,7 +9,7 @@ public partial class SettingsTask
     {
         if (settings is not null)
         {
-            this.settings = new(settings);
+            CurrentSettings = new(settings);
         }
 
         this.buildTask = buildTask;
@@ -50,44 +49,6 @@ public partial class SettingsTask
     public SettingsTask AppendValues(params KeyValuePair<string, object>[] values)
     {
         CurrentSettings.AppendValues(values);
-        return this;
-    }
-
-    /// <summary>
-    /// Ignore parameters in 'verified' filename resulting in the same verified file for each testcase.
-    /// Note that the 'received' files contain the parameters.
-    /// </summary>
-    [Pure]
-    public SettingsTask IgnoreParametersForVerified(params object?[] parameters)
-    {
-        CurrentSettings.IgnoreParametersForVerified(parameters);
-        return this;
-    }
-
-    /// <summary>
-    /// Define the parameter values being used by a parameterised (aka data drive) test.
-    /// In most cases the parameter values can be automatically resolved.
-    /// When this is not possible, an exception will be thrown instructing the use of <see cref="UseParameters" />
-    /// Not compatible with <see cref="UseTextForParameters" />.
-    /// </summary>
-    [Pure]
-    public SettingsTask UseParameters(params object?[] parameters)
-    {
-        CurrentSettings.UseParameters(parameters);
-        return this;
-    }
-
-    [Pure]
-    public SettingsTask UseParameters<T>(T parameter)
-    {
-        CurrentSettings.UseParameters(parameter);
-        return this;
-    }
-
-    [Pure]
-    public SettingsTask UseParameters<T>(T[] parameters)
-    {
-        CurrentSettings.UseParameters(parameters);
         return this;
     }
 
@@ -272,29 +233,6 @@ public partial class SettingsTask
     }
 
     /// <summary>
-    /// Provide parameters to hash together and pass to <see cref="UseTextForParameters" />.
-    /// Used to get a deterministic file name while avoiding long paths.
-    /// Combines <see cref="UseParameters" /> and <see cref="HashParameters" />.
-    /// </summary>
-    [Pure]
-    public SettingsTask UseHashedParameters(params object?[] parameters)
-    {
-        CurrentSettings.UseHashedParameters(parameters);
-        return this;
-    }
-
-    /// <summary>
-    /// Hash parameters together and pass to <see cref="UseTextForParameters" />.
-    /// Used to get a deterministic file name while avoiding long paths.
-    /// </summary>
-    [Pure]
-    public SettingsTask HashParameters()
-    {
-        CurrentSettings.HashParameters();
-        return this;
-    }
-
-    /// <summary>
     /// Use the current processor architecture (x86/x64/arm/arm64) to make the test results unique.
     /// Used when a test produces different results based on processor architecture.
     /// </summary>
@@ -344,18 +282,6 @@ public partial class SettingsTask
     }
 
     /// <summary>
-    /// Use a custom text for the `Parameters` part of the file name.
-    /// Not compatible with <see cref="UseParameters" />.
-    /// Where the file format is `{CurrentDirectory}/{TestClassName}.{TestMethodName}_{Parameters}_{UniqueFor1}_{UniqueFor2}_{UniqueForX}.verified.{extension}`.
-    /// </summary>
-    [Pure]
-    public SettingsTask UseTextForParameters(string parametersText)
-    {
-        CurrentSettings.UseTextForParameters(parametersText);
-        return this;
-    }
-
-    /// <summary>
     /// Use the current runtime to make the test results unique.
     /// Used when a test produces different results based on runtime.
     /// </summary>
@@ -377,7 +303,8 @@ public partial class SettingsTask
         return this;
     }
 
-    public VerifySettings CurrentSettings => settings ??= new();
+    [field: AllowNull, MaybeNull]
+    public VerifySettings CurrentSettings => field ??= new();
 
     [Pure]
     public Task<VerifyResult> ToTask() =>

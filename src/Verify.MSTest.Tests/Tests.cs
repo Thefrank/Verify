@@ -1,14 +1,17 @@
-﻿// ReSharper disable UnusedParameter.Local
+// ReSharper disable ArrangeObjectCreationWhenTypeNotEvident
+
 [TestClass]
-public class Tests :
-    VerifyBase
+public partial class Tests
 {
-    // ReSharper disable once UnusedMember.Local
+    [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used by snippet in docs")]
+    [SuppressMessage("Style", "IDE0022:Use expression body for method", Justification = "Used by snippet in docs")]
     static void DerivePathInfo()
     {
+        // ReSharper disable once UnusedParameter.Local
+
         #region DerivePathInfoMSTest
 
-        DerivePathInfo(
+        Verifier.DerivePathInfo(
             (sourceFile, projectDirectory, type, method) => new(
                 directory: Path.Combine(projectDirectory, "Snapshots"),
                 typeName: type.Name,
@@ -27,12 +30,6 @@ public class Tests :
     public Task UseFileNameWithParam(string arg) =>
         Verify(arg)
             .UseFileName("UseFileNameWithParam");
-
-    [DataTestMethod]
-    [DataRow("Value1")]
-    public Task UseTextForParameters(string arg) =>
-        Verify(arg)
-            .UseTextForParameters("TextForParameter");
 
     [TestMethod]
     public Task StringTarget() =>
@@ -53,6 +50,9 @@ public class Tests :
         await Assert.ThrowsExceptionAsync<VerifyException>(
             () => Verify("Bar", settings));
     }
+
+#if NET9_0
+
     [ResultFilesCallback]
     [TestMethod]
     public async Task AutoVerifyHasAttachment()
@@ -60,7 +60,7 @@ public class Tests :
         var path = CurrentFile.Relative("Tests.AutoVerifyHasAttachment.verified.txt");
         var fullPath = Path.GetFullPath(path);
         File.Delete(fullPath);
-        File.WriteAllText(fullPath,"Foo");
+        File.WriteAllText(fullPath, "Foo");
         ResultFilesCallback.Callback = list =>
         {
             Assert.AreEqual(1, list.Count);
@@ -72,6 +72,8 @@ public class Tests :
         settings.AutoVerify();
         await Verify("Bar", settings);
     }
+
+#endif
 
     [ResultFilesCallback]
     [TestMethod]
@@ -104,7 +106,7 @@ public class Tests :
         var settings = new VerifySettings();
         settings.DisableDiff();
         await Assert.ThrowsExceptionAsync<VerifyException>(
-            () => Verify("Bar", [new Target("txt", "Value")], settings));
+            () => Verify("Bar", [new("txt", "Value")], settings));
     }
 
     [ResultFilesCallback]
@@ -122,10 +124,10 @@ public class Tests :
         var settings = new VerifySettings();
         settings.DisableDiff();
         await Assert.ThrowsExceptionAsync<VerifyException>(
-            () => Verify("Bar",[new Target("txt", "Value")], settings));
+            () => Verify("Bar", [new("txt", "Value")], settings));
     }
 
-    #region ExplicitTargetsMsTest
+    #region ExplicitTargetsMSTest
 
     [TestMethod]
     public Task WithTargets() =>
@@ -147,17 +149,16 @@ public class Tests :
     [TestMethod]
     public Task EnumerableTargets() =>
         Verify(
-            new[]
-            {
-                new Target(
-                    extension: "txt",
-                    data: "Raw target value",
-                    name: "targetName")
-            });
+        [
+            new Target(
+                extension: "txt",
+                data: "Raw target value",
+                name: "targetName")
+        ]);
 
     static string directoryPathToVerify = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify");
 
-    #region VerifyDirectoryMsTest
+    #region VerifyDirectoryMSTest
 
     [TestMethod]
     public Task WithDirectory() =>
@@ -167,11 +168,30 @@ public class Tests :
 
     static string zipPath = Path.Combine(AttributeReader.GetSolutionDirectory(), "ToVerify.zip");
 
-    #region WithZipMsTest
+    #region WithZipMSTest
 
     [TestMethod]
     public Task WithZip() =>
         VerifyZip(zipPath);
 
     #endregion
+
+    [TestMethod]
+    public Task VerifyFileWithRelativePath() =>
+        VerifyFile("sample.png");
+
+    [TestMethod]
+    public Task VerifyFileWithFullPath()
+    {
+        var fullPath = Path.GetFullPath("sample.png");
+        return VerifyFile(fullPath);
+    }
+
+    [TestMethod]
+    public Task VerifyFileWithFullPathAndUseFileName()
+    {
+        var fullPath = Path.GetFullPath("sample.png");
+        return VerifyFile(fullPath)
+            .UseFileName("customFileName");
+    }
 }

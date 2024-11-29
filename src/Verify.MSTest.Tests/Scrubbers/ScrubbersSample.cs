@@ -1,10 +1,7 @@
-﻿namespace TheTests;
-
 #region ScrubbersSampleMSTest
 
 [TestClass]
-public class ScrubbersSample :
-    VerifyBase
+public partial class ScrubbersSample
 {
     [TestMethod]
     public Task Lines()
@@ -62,31 +59,6 @@ public class ScrubbersSample :
             .ScrubLines(removeLine: _ => _.Contains('J'))
             .ScrubLinesContaining("b", "D")
             .ScrubLinesContaining(StringComparison.Ordinal, "H");
-
-    [TestMethod]
-    public Task AfterSerialization()
-    {
-        var target = new ToBeScrubbed
-        {
-            RowVersion = "7D3"
-        };
-
-        var settings = new VerifySettings();
-        settings.AddScrubber(_ => _.Replace("7D3", "TheRowVersion"));
-        return Verify(target, settings);
-    }
-
-    [TestMethod]
-    public Task AfterSerializationFluent()
-    {
-        var target = new ToBeScrubbed
-        {
-            RowVersion = "7D3"
-        };
-
-        return Verify(target)
-            .AddScrubber(_ => _.Replace("7D3", "TheRowVersion"));
-    }
 
     [TestMethod]
     public Task RemoveOrReplace() =>

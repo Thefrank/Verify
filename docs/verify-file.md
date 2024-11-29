@@ -16,7 +16,7 @@ Verifies the contents of a file.
 public Task VerifyFilePath() =>
     VerifyFile("sample.txt");
 ```
-<sup><a href='/src/Verify.Tests/StreamTests.cs#L186-L192' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFile' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/StreamTests.cs#L190-L196' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFile' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -33,7 +33,20 @@ public Task VerifyFileWithInfo() =>
         "sample.txt",
         info: "the info");
 ```
-<sup><a href='/src/Verify.Tests/StreamTests.cs#L204-L212' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFileWithInfo' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/StreamTests.cs#L216-L224' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFileWithInfo' title='Start of snippet'>anchor</a></sup>
+<!-- endSnippet -->
+
+
+## Using a custom extension
+
+<!-- snippet: VerifyFileExtension -->
+<a id='snippet-VerifyFileExtension'></a>
+```cs
+[Fact]
+public Task VerifyFilePathWithExtension() =>
+    VerifyFile("sample.txt", extension: "csv");
+```
+<sup><a href='/src/Verify.Tests/StreamTests.cs#L198-L204' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFileExtension' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 
@@ -46,21 +59,15 @@ Use the functionality of VerifyTests outside of a unit test.
 ```cs
 public async Task VerifyExternalFile()
 {
-    var solutionDirectory = AttributeReader.GetSolutionDirectory();
-    var settings = new VerifySettings();
-    settings.DisableRequireUniquePrefix();
-
-    var sourceFile = Path.Combine(solutionDirectory, "Verify.Tests", "sample.txt");
-
-    Func<InnerVerifier, Task<VerifyResult>> verify = _ => _.VerifyFile(sourceFile, null);
-    await new SettingsTask(
-        settings,
-        async verifySettings =>
-        {
-            using var verifier = new InnerVerifier(sourceFile, verifySettings);
-            return await verify(verifier);
-        });
+    using var verifier = new InnerVerifier(targetDirectory, name: "sample");
+    await verifier.VerifyFile(filePath);
 }
 ```
-<sup><a href='/src/Verify.Tests/InnerVerifyTests.cs#L16-L36' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFileWithoutUnitTest' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/InnerVerifyTests/InnerVerifyTests.cs#L17-L25' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyFileWithoutUnitTest' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
+
+Result:
+
+```
+{targetDirectory}/sample.verified.txt
+```

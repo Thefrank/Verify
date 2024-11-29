@@ -1,7 +1,6 @@
 // Non-nullable field is uninitialized.
 
-using System.Runtime.InteropServices;
-
+// ReSharper disable UnusedParameter.Local
 #pragma warning disable CS8618
 
 public class Tests
@@ -33,7 +32,7 @@ public class Tests
     {
         var exception = await Assert.ThrowsAsync<Exception>(() => Verify("Value")
             .UseParameters(1, 2, 3));
-        Assert.Equal("The number of passed in parameters (3) must be fewer than the number of parameters for the method (2).", exception.Message);
+        Assert.Equal("The number of passed in parameters (3) must not exceed the number of parameters for the method (2).", exception.Message);
     }
 
     // [Theory]
@@ -61,16 +60,9 @@ public class Tests
 
     [Fact]
     public Task TreatAsString() =>
-        Verify(
-            new ClassWithToString
-            {
-                Property = "Foo"
-            });
+        Verify(new ClassWithToString("Foo"));
 
-    class ClassWithToString
-    {
-        public string Property { get; set; } = null!;
-    }
+    record ClassWithToString(string Property);
 
     [Fact]
     // ReSharper disable once IdentifierTypo
@@ -127,8 +119,7 @@ public class Tests
         Assert.True(onVerifyMismatchCalled2);
     }
 
-    // ReSharper disable UnusedParameter.Local
-#region OnInstanceHandlers
+    #region OnInstanceHandlers
 
     [Fact]
     public Task OnCallbacks()
@@ -153,11 +144,38 @@ public class Tests
                 return Task.CompletedTask;
             });
 
-        return Verify("value");
+        return Verify("value", settings);
     }
 
-#endregion
-// ReSharper restore UnusedParameter.Local
+    #endregion
+
+    #region OnFluentHandlers
+
+    [Fact]
+    public Task OnFluentCallbacks() =>
+        Verify("value")
+            .OnVerify(
+                before: () => Debug.WriteLine("before"),
+                after: () => Debug.WriteLine("after"))
+            .OnFirstVerify(
+                (receivedFile, receivedText, autoVerify) =>
+                {
+                    Debug.WriteLine(receivedFile);
+                    Debug.WriteLine(receivedText);
+                    return Task.CompletedTask;
+                })
+            .OnVerifyMismatch(
+                (filePair, message, autoVerify) =>
+                {
+                    Debug.WriteLine(filePair.ReceivedPath);
+                    Debug.WriteLine(filePair.VerifiedPath);
+                    Debug.WriteLine(message);
+                    return Task.CompletedTask;
+                });
+
+    #endregion
+
+    // ReSharper restore UnusedParameter.Local
 
 #if NET6_0_OR_GREATER
     static bool onFirstVerifyCalled;
@@ -273,6 +291,24 @@ public class Tests
         await Verify("value")
             .UniqueForRuntimeAndVersion()
             .IgnoreParametersForVerified(param)
+            .AutoVerify();
+        await Task.Delay(1000);
+        Assert.False(File.Exists(receivedFile));
+        Assert.False(File.Exists(verifiedFile));
+    }
+
+    [Theory]
+    [InlineData("P1", "P2")]
+    public async Task DanglingFilesIgnoreParameters(string param1, string param2)
+    {
+        var receivedFile = CurrentFile.Relative($"Tests.DanglingFilesIgnoreParameters_param1=P1_param2=P2.{Namer.RuntimeAndVersion}#01.received.txt");
+        var verifiedFile = CurrentFile.Relative($"Tests.DanglingFilesIgnoreParameters_param2=P2.{Namer.RuntimeAndVersion}#01.verified.txt");
+        File.WriteAllText(receivedFile, "");
+        File.WriteAllText(verifiedFile, "");
+        await Verify("value")
+            .UniqueForRuntimeAndVersion()
+            .UseParameters(param1, param2)
+            .IgnoreParameters(nameof(param1))
             .AutoVerify();
         await Task.Delay(1000);
         Assert.False(File.Exists(receivedFile));

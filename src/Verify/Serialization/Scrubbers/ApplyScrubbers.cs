@@ -23,7 +23,7 @@ static class ApplyScrubbers
         replacements[currentDir] = "{CurrentDirectory}";
         replacements[altCurrentDir + IoHelpers.AltDirectorySeparator] = "{CurrentDirectory}";
         replacements[altCurrentDir] = "{CurrentDirectory}";
-#if !NET5_0_OR_GREATER
+#if !NET6_0_OR_GREATER
         if (CodeBaseLocation.CurrentDirectory is not null)
         {
             var codeBaseLocation = CleanPath(CodeBaseLocation.CurrentDirectory);
@@ -129,7 +129,7 @@ static class ApplyScrubbers
 
         foreach (var scrubber in VerifierSettings.GlobalScrubbers)
         {
-            scrubber(target, counter);
+            scrubber(target, counter, settings.Context);
         }
 
         foreach (var replace in replacements)
@@ -157,7 +157,7 @@ static class ApplyScrubbers
 
         foreach (var scrubber in VerifierSettings.GlobalScrubbers)
         {
-            scrubber(builder, counter);
+            scrubber(builder, counter, settings.Context);
         }
 
         foreach (var replace in replacements)

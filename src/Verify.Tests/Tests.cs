@@ -119,6 +119,21 @@ public class Tests
         Assert.True(onVerifyMismatchCalled2);
     }
 
+    [Fact]
+    public async Task OnCallbacksTest()
+    {
+        var onVerifyBeforeCalled = false;
+        var onVerifyAfterCalled = false;
+        var settings = new VerifySettings();
+        settings.OnVerify(
+            before: () => onVerifyBeforeCalled = true,
+            after: () => onVerifyAfterCalled = true);
+
+        await Verify("value", settings);
+        Assert.True(onVerifyBeforeCalled);
+        Assert.True(onVerifyAfterCalled);
+    }
+
     #region OnInstanceHandlers
 
     [Fact]
@@ -297,6 +312,8 @@ public class Tests
         Assert.False(File.Exists(verifiedFile));
     }
 
+#if NET9_0
+
     [Theory]
     [InlineData("P1", "P2")]
     public async Task DanglingFilesIgnoreParameters(string param1, string param2)
@@ -314,6 +331,8 @@ public class Tests
         Assert.False(File.Exists(receivedFile));
         Assert.False(File.Exists(verifiedFile));
     }
+
+#endif
 
     class Element
     {

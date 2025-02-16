@@ -151,10 +151,10 @@ public class Namer
         Architecture = RuntimeInformation
             .ProcessArchitecture.ToString()
             .ToLower();
-        OperatingSystemPlatform = GetOSPlatform();
+        OperatingSystemPlatform = GetOsPlatform();
     }
 
-    static string GetOSPlatform()
+    static string GetOsPlatform()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
@@ -171,7 +171,7 @@ public class Namer
             return "OSX";
         }
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
 
         if (OperatingSystem.IsAndroid())
         {

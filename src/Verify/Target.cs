@@ -42,8 +42,12 @@ public readonly struct Target
 
         if (FileExtensions.IsTextExtension(extension))
         {
-            throw new($"Dont pass a stream for text. If {extension} is not a text extension then add `FileExtensions.RemoveTextExtensions(\"{extension}\")` at initialization; " +
-                      "otherwise use `Target(string extension, string data)` or `Target(string extension, StringBuilder data, string? name)`.");
+            throw new(
+                $"""
+                 Don't pass a stream for text.
+                 If {extension} is not a text extension then use `FileExtensions.RemoveTextExtensions(\"{extension}\")` at initialization;
+                 Otherwise use `Target(string extension, string data)` or `Target(string extension, StringBuilder data, string? name)`.
+                 """);
         }
 
         Extension = extension;
@@ -54,13 +58,8 @@ public readonly struct Target
 
     public Target(string extension, StringBuilder data, string? name = null)
     {
-        Guards.AgainstBadExtension(extension);
         Guard.NotEmpty(name);
-        if (!FileExtensions.IsTextExtension(extension))
-        {
-            throw new($"Dont pass a text for a binary extension. If {extension} is a text extension then add `FileExtensions.AddTextExtension(\"{extension}\")` at initialization; " +
-                      "otherwise use `Target(string extension, Stream data, string? name)`.");
-        }
+        ValidateExtension(extension);
 
         Extension = extension;
         Name = name;
@@ -68,15 +67,27 @@ public readonly struct Target
         stringBuilderData = data;
     }
 
-    public Target(string extension, string data, string? name = null)
+    static void ValidateExtension(string extension)
     {
         Guards.AgainstBadExtension(extension);
-        Guard.NotEmpty(name, nameof(name));
-        if (!FileExtensions.IsTextExtension(extension))
+        if (extension == "noextension" ||
+            FileExtensions.IsTextExtension(extension))
         {
-            throw new($"Dont pass a text for a binary extension. If {extension} is a text extension then add `FileExtensions.AddTextExtension(\"{extension}\")` at initialization; " +
-                      "otherwise use `Target(string extension, Stream data, string? name)`.");
+            return;
         }
+
+        throw new(
+            $"""
+             Don't pass text for a binary extension.
+             If {extension} is a text extension then use `FileExtensions.AddTextExtension("{extension}")` at initialization;
+             Otherwise use `Target(string extension, Stream data, string? name)`.
+             """);
+    }
+
+    public Target(string extension, string data, string? name = null)
+    {
+        Guard.NotEmpty(name, nameof(name));
+        ValidateExtension(extension);
 
         Extension = extension;
         Name = name;

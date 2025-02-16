@@ -2,21 +2,24 @@
 
 public static partial class VerifierSettings
 {
-    internal static List<Action<StringBuilder, Counter>> GlobalScrubbers = [];
+    internal static List<Action<StringBuilder, Counter, IReadOnlyDictionary<string, object>>> GlobalScrubbers = [];
 
     /// <summary>
     /// Modify the resulting test content using custom code.
     /// </summary>
-    public static void AddScrubber(Action<StringBuilder> scrubber, ScrubberLocation location = ScrubberLocation.First)
-    {
-        InnerVerifier.ThrowIfVerifyHasBeenRun();
-        AddScrubber((builder, _) => scrubber(builder), location);
-    }
+    public static void AddScrubber(Action<StringBuilder> scrubber, ScrubberLocation location = ScrubberLocation.First) =>
+        AddScrubber((builder, _, _) => scrubber(builder), location);
 
     /// <summary>
     /// Modify the resulting test content using custom code.
     /// </summary>
-    public static void AddScrubber(Action<StringBuilder, Counter> scrubber, ScrubberLocation location = ScrubberLocation.First)
+    public static void AddScrubber(Action<StringBuilder, Counter> scrubber, ScrubberLocation location = ScrubberLocation.First) =>
+        AddScrubber((builder, counter, _) => scrubber(builder, counter), location);
+
+    /// <summary>
+    /// Modify the resulting test content using custom code.
+    /// </summary>
+    public static void AddScrubber(Action<StringBuilder, Counter, IReadOnlyDictionary<string, object>> scrubber, ScrubberLocation location = ScrubberLocation.First)
     {
         InnerVerifier.ThrowIfVerifyHasBeenRun();
         switch (location)
@@ -96,7 +99,7 @@ public static partial class VerifierSettings
             DateScrubber.BuildDateTimeOffsetScrubber(format, culture),
             location);
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
 
     /// <summary>
     /// Replace inline <see cref="Date" />s with a placeholder.

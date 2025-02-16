@@ -63,8 +63,8 @@ approach(s) selected is a personal preference.
 * [Via the clipboard](/docs/clipboard.md).
 * Manually making the change in the [launched diff tool](https://github.com/VerifyTests/DiffEngine#supported-tools).
   Either with a copy paste, or some tools have commands to automate this via a shortcut or a button.
-* Manually on the file system. By renaming the `.received.` file to `.verified.`. This can be automated via a scripted
-  to bulk accept all (by matching a pattern) `.received.` files.
+* Manually on the file system, by renaming the `.received.` file to `.verified.`. This can be automated via scripts
+  to bulk accept all `.received.` files by matching a pattern.
 * Using the dotnet tool [Verify.Terminal](https://github.com/VerifyTests/Verify.Terminal).
 
 
@@ -388,8 +388,8 @@ accept-->closeDiff
 discard-->closeDiff
 ```
 
-When the test is initially run will fail. If a [Diff Tool](https://github.com/VerifyTests/DiffEngine) is detected it
-will display the diff.
+When the test is initially run it will fail. If a [Diff Tool](https://github.com/VerifyTests/DiffEngine) is detected it
+will be used to display the diff.
 
 ![InitialDiff](/docs/InitialDiff.png)
 
@@ -487,7 +487,7 @@ public static class ClassBeingTested
 <sup><a href='/src/TargetLibrary/ClassBeingTestedChanged.cs#L3-L30' title='Snippet source file'>snippet source</a> | <a href='#snippet-ClassBeingTestedChanged' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
-And the test is re run it will fail.
+And the test is re-run it will fail.
 
 
 #### The [Diff Tool](https://github.com/VerifyTests/DiffEngine) will display the diff:
@@ -800,7 +800,7 @@ var result = await Verify(
     });
 Assert.Contains("Value To Check", result.Text);
 ```
-<sup><a href='/src/Verify.Tests/Tests.cs#L410-L419' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyResult' title='Start of snippet'>anchor</a></sup>
+<sup><a href='/src/Verify.Tests/Tests.cs#L429-L438' title='Snippet source file'>snippet source</a> | <a href='#snippet-VerifyResult' title='Start of snippet'>anchor</a></sup>
 <!-- endSnippet -->
 
 If using `Verifier.Throws`, the resulting `Exception` will also be accessible
@@ -851,11 +851,11 @@ Verify follows [Semantic Versioning](https://semver.org/). The same applies for 
 Small changes in the resulting snapshot files may be deployed in a minor version. As such nuget updates to `Verify.*`
 should be done as follows:
 
-* Updates all `Verify.*`packages in isolation
+* Update all `Verify.*`packages in isolation
 * Re-run all tests.
 * If there are changes, ensure they look correct given the release notes. If the changes do not look correct, raise an
   issue.
-* Accept those changes.
+* Accept the changes.
 
 Snapshot changes do not trigger a major version change to avoid
 causing [Diamond dependency](https://en.wikipedia.org/wiki/Dependency_hell#Problems) issues for downstream extensions.
@@ -893,7 +893,8 @@ information sources and warn about particular gotchas:
 
 ### Blogs
 
-* [Snapshot Testing in .NET with Verify - Khalid Abuhakmeh (12 July 2024)](https://blog.jetbrains.com/dotnet/2024/07/11/snapshot-testing-in-net-with-verify/)
+* [Library: Verify - Snapshot Testing - Simplify Complex Object Testing (2 Jan 2025)](https://vukvuk.com/posts/library-verify-and-snapshot-testing)
+* [Snapshot Testing in .NET with Verify - Khalid Abuhakmeh (12 Jul 2024)](https://blog.jetbrains.com/dotnet/2024/07/11/snapshot-testing-in-net-with-verify/)
 * [Snapshot testing in C# with Verify - Tim Deschryver (21 Feb 2024)](https://timdeschryver.dev/bits/snapshot-testing-in-c-with-verify)
 * [Snapshot Testing in C# - William Rees (13 Feb 2024)](https://wil-rees.medium.com/snapshot-testing-with-verify-xunit-f1ae5127b800)
 * [I want to do a snapshot test with C# (26 Dec 2023)](https://zzzkan.me/blog/verify-tests/)
@@ -902,6 +903,7 @@ information sources and warn about particular gotchas:
 * [Compare object values in xUnit C# with Verify - Pierre Belin (18 Nov 2022)](https://pierrebelin.medium.com/compare-object-values-in-xunit-c-with-verify-215d02b4ed39/)
 * [Unit testing assertions are now easier than ever with Verify Snapshot tool - Rana Krishnrajsinh (5 Nov 2022)](https://www.youtube.com/watch?v=T1ZPGi_dHFM)
 * [The easiest way to Unit Test with Verify in C# - Tomasz Juszczak (6 Sep 2022)](https://prographers.com/blog/the-easiest-way-to-unit-test-with-verify-in-c)
+* [Snapshot testing Verify.MongoDB: David Gardiner (31 Mar 2022)](https://david.gardiner.net.au/2022/03/verify-mongodb.html)
 * [Testing an incremental generator with snapshot testing (14 Dec 2021)](https://andrewlock.net/creating-a-source-generator-part-2-testing-an-incremental-generator-with-snapshot-testing/)
 * [5 helpful Nuget package for Unit Testing in .NET (16 Oct 2021)](https://medium.com/@niteshsinghal85/5-helpful-nuget-package-for-unit-testing-in-net-87c2e087c6d)
 * [Snapshot Testing with Verify: Carl Franklin's Blazor Train (3 Apr 2020)](https://rowell.heria.uk/blog/2020/11/23/verify-snapshot-testing-for-c)
@@ -910,6 +912,8 @@ information sources and warn about particular gotchas:
 
 ### Podcasts
 
+* [Accessibilité, Azure Storage Action, Golden Master et Agentic AI (15 Jan 2025)](https://devdevdev.net/tr01-2025-accessibilite-azure-storage-action-golden-master-et-agentic-ai/)
+* [Adventures in .NET: Mastering Dotnet Testing: Using Verify to Minimize Assertions (2 Jul 2024)](https://topenddevs.com/podcasts/adventures-in-net/episodes/mastering-dotnet-testing-using-verify-to-minimize-assertions-net-192)
 * [Unhandled Exception podcast: Snapshot Testing (26 Nov 2021)](https://unhandledexceptionpodcast.com/posts/0029-snapshottesting/)
 * [Snapshot Testing with Verify - Dan Clarke (10 Dec 2021)](https://www.danclarke.com/snapshot-testing-with-verify)
 
@@ -974,6 +978,8 @@ information sources and warn about particular gotchas:
 * [Verify.SourceGenerators](https://github.com/VerifyTests/Verify.SourceGenerators): Verification of C# Source Generators.
 * [Verify.SystemJson](https://github.com/VerifyTests/Verify.SystemJson): Support for converting System.Text.Json types.
 * [Verify.Terminal](https://github.com/VerifyTests/Verify.Terminal): A dotnet tool for managing Verify snapshots.
+* [Verify.Ulid](https://github.com/VerifyTests/Verify.Ulid): Enable scrubbing of Universally Unique Lexicographically Sortable Identifiers via the [Ulid](https://github.com/Cysharp/Ulid) package.
+* [Verify.NUlid](https://github.com/VerifyTests/Verify.NUlid): Enable scrubbing of Universally Unique Lexicographically Sortable Identifiers via [NUlid](https://github.com/RobThree/NUlid) package.
 * [Verify.WinForms](https://github.com/VerifyTests/Verify.WinForms): Verification of WinForms UIs.
 * [Verify.Xamarin](https://github.com/VerifyTests/Verify.Xamarin): Verification of Xamarin UIs.
 * [Verify.Xaml](https://github.com/VerifyTests/Verify.Xaml): Verification of Xaml UIs.
@@ -993,14 +999,26 @@ information sources and warn about particular gotchas:
   * [VerifyFile](/docs/verify-file.md)
   * [VerifyXml](/docs/verify-xml.md)
   * [Serializer Settings](/docs/serializer-settings.md)
-  * [Guid behavior](/docs/guids.md)
-  * [Date behavior](/docs/dates.md)
+    * [Obsolete members](/docs/obsolete-members.md)
+    * [Guids](/docs/guids.md)
+    * [Dates](/docs/dates.md)
+    * [Scrubbing](/docs/scrubbers.md)
+    * [Members that throw](/docs/members-throw.md)
+    * [Ordering](/docs/ordering.md)
+    * [Encoding](/docs/encoding.md)
+    * [JsonAppender](/docs/jsonappender.md)
   * [File naming](/docs/naming.md)
   * [AppendFile](/docs/append-file.md)
   * [Parameterised tests](/docs/parameterised.md)
+    * [NUnit](/docs/parameterised-nunit.md)
+    * [Xunit V2](/docs/parameterised-xunitv2.md)
+    * [Xunit V3](/docs/parameterised-xunitv3.md)
+    * [MSTest](/docs/parameterised-mstest.md)
+    * [TUnit](/docs/parameterised-tunit.md)
+    * [Fixie](/docs/parameterised-fixie.md)
+    * [Expecto](/docs/parameterised-expecto.md)
   * [Combinations](/docs/combinations.md)
   * [Named Tuples](/docs/named-tuples.md)
-  * [Scrubbers](/docs/scrubbers.md)
   * [Diff Engine](https://github.com/VerifyTests/DiffEngine)
   * [Diff Tools](https://github.com/VerifyTests/DiffEngine/blob/master/docs/diff-tool.md)
   * [Diff Tool Order](https://github.com/VerifyTests/DiffEngine/blob/master/docs/diff-tool.order.md)
@@ -1018,5 +1036,4 @@ information sources and warn about particular gotchas:
 
 ## Icon
 
-[Helmet](https://thenounproject.com/term/helmet/9554/) designed
-by [Leonidas Ikonomou](https://thenounproject.com/alterego) from [The Noun Project](https://thenounproject.com).
+[Helmet](https://thenounproject.com/term/helmet/9554/) designed by [Leonidas Ikonomou](https://thenounproject.com/alterego) from [The Noun Project](https://thenounproject.com).

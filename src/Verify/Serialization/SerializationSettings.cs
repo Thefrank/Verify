@@ -64,6 +64,8 @@ partial class SerializationSettings
         enumerableInterceptors = new(settings.enumerableInterceptors);
         scrubGuids = settings.scrubGuids;
         includeObsoletes = settings.includeObsoletes;
+        ignoredMemberPredicatesByString = settings.ignoredMemberPredicatesByString.Clone();
+        ignoredMemberPredicatesByMember = settings.ignoredMemberPredicatesByMember.Clone();
 
         jsonSettings = BuildSettings();
     }
@@ -156,8 +158,8 @@ partial class SerializationSettings
         }
     }
 
-    internal bool SortDictionaries = true;
+    internal bool OrderDictionaries = true;
 
     public void DontSortDictionaries() =>
-        SortDictionaries = false;
+        OrderDictionaries = false;
 }

@@ -43,6 +43,17 @@ public class VerifyJsonWriter :
         base.WriteRawValue(value);
     }
 
+    public override void WriteValue(char value)
+    {
+        if (settings.StrictJson)
+        {
+            base.WriteValue(value);
+            return;
+        }
+
+        base.WriteRawValue(value.ToString());
+    }
+
     public void WriteRawValueWithScrubbers(string value) =>
         WriteRawValueWithScrubbers(value.AsSpan());
 
@@ -241,7 +252,7 @@ public class VerifyJsonWriter :
 
         var declaringType = target.GetType();
         var memberType = value.GetType();
-        if (serialization.TryGetScrubOrIgnore(declaringType, memberType, name, out var scrubOrIgnore))
+        if (serialization.TryGetScrubOrIgnore(declaringType, memberType, name, null, out var scrubOrIgnore))
         {
             if (scrubOrIgnore == ScrubOrIgnore.Ignore)
             {

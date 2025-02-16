@@ -210,7 +210,7 @@ public class CombinationResultsConverter :
             for (var keyIndex = 0; keyIndex < keysLength; keyIndex++)
             {
                 var key = item.Keys[keyIndex];
-                var name = VerifierSettings.GetNameForParameter(key, pathFriendly: false);
+                var name = VerifierSettings.GetNameForParameter(key, writer.Counter, pathFriendly: false);
                 keyValues[itemIndex, keyIndex] = name;
                 var currentKeyLength = maxKeyLengths[keyIndex];
                 if (name.Length > currentKeyLength)
@@ -329,7 +329,7 @@ Combination serialization can be customized using a Converter.
 
 Inherit from `CombinationResultsConverter` and override the desired members.
 
-The below sample override `BuildPropertyName` to customize the property name. It bypasses the default implementation and hence does not pad columns or use VerifierSettings.GetNameForParameter for key conversion.
+The below sample override `BuildPropertyName` to customize the property name. It bypasses the default implementation and hence does not pad columns or use `VerifierSettings.GetNameForParameter` for key conversion.
 
 <!-- snippet: CombinationSample_CustomSerializationConverter -->
 <a id='snippet-CombinationSample_CustomSerializationConverter'></a>

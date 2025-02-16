@@ -17,13 +17,7 @@ public class DateScrubberTests
 
     [Fact]
     public Task GetCultureDates() =>
-        Verify(
-            new
-            {
-                invarient = DateScrubber.GetCultureDates(CultureInfo.InvariantCulture),
-                parent = DateScrubber.GetCultureDates(CultureInfo.GetCultureInfo("de")),
-                child = DateScrubber.GetCultureDates(CultureInfo.GetCultureInfo("de-DE"))
-            });
+        Verify(DateFormatLengthCalculator.GetCultureLengthInfo(CultureInfo.InvariantCulture));
 
     [Theory]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "no match")]
@@ -109,6 +103,40 @@ public class DateScrubberTests
         finally
         {
             Counter.Stop();
+        }
+    }
+
+    [Fact]
+    public void ReplaceDateTimes_AllCultures()
+    {
+        foreach (var culture in CultureInfo.GetCultures(CultureTypes.AllCultures))
+        {
+            var format = "yyyy MMMM MMM MM dddd ddd dd d HH H mm m ss s fffff tt";
+            var counter = Counter.Start();
+            var dateTime = DateTime.Now;
+
+            var dateFormat = culture.DateTimeFormat;
+            if (dateFormat.AMDesignator.Length == 0 &&
+                dateFormat.PMDesignator.Length == 0)
+            {
+                format = format.Replace(" tt", "");
+            }
+
+            var value = dateTime.ToString(format, culture);
+            var builder = new StringBuilder(value);
+            DateScrubber.ReplaceDateTimes(builder, format, counter, culture);
+            var result = builder.ToString();
+            if (result == "DateTime_1")
+            {
+                continue;
+            }
+
+            throw new(
+                $"""
+                 {culture.DisplayName} {culture.Name}
+                 {result}
+                 {value}
+                 """);
         }
     }
 

@@ -58,7 +58,15 @@ public class SerializationTests
 
     #endregion
 
-#if NET5_0_OR_GREATER || net48
+    [Fact]
+    public Task Char() =>
+        Verify(
+            new
+            {
+                Char = 'a'
+            });
+
+#if NET6_0_OR_GREATER || net48
     [Fact]
     public Task ValueTasks()
     {
@@ -135,10 +143,10 @@ public class SerializationTests
             .IgnoreMember("ignored");
     }
 
-    #region DontSortDictionaries
+    #region DontOrderDictionaries
 
     [Fact]
-    public Task DontSortDictionaries()
+    public Task DontOrderDictionaries()
     {
         var dictionary = new Dictionary<string, string>
         {
@@ -1425,7 +1433,7 @@ public class SerializationTests
             .ScrubInlineDateTimes("f");
     }
 
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
 
     [Fact]
     public async Task ScrubInlineDateTimesInValidFormat()
@@ -1524,6 +1532,13 @@ public class SerializationTests
             .ScrubInlineDateTimes("yyyy-MM-dd");
 
     [Fact]
+    public Task ScrubInlineDateTimesPaddedF()
+    {
+        var dateTime = DateTime.Now;
+        return Verify($"a {dateTime:F} b").ScrubInlineDateTimes("F");
+    }
+
+    [Fact]
     public Task ScrubInlineDateTimesWrappedInNumber() =>
         Verify("12020-12-101")
             .ScrubInlineDateTimes("yyyy-MM-dd");
@@ -1544,6 +1559,24 @@ public class SerializationTests
         return Verify(product)
             .ScrubInlineDateTimes("f");
     }
+
+    [Fact]
+    public Task ScrubInlineDateTimesUsG()
+    {
+        var settings = new VerifySettings();
+        settings.ScrubInlineDateTimes("G", new("en-US"));
+
+        return Verify("12/11/2024 10:36:43 AM", settings);
+    }
+    [Fact]
+    public Task ScrubInlineDateTimesWithLongAmPm()
+    {
+        var settings = new VerifySettings();
+        settings.ScrubInlineDateTimes("yyyy MM dd HH:mm tt", new("am-ET"));
+
+        return Verify("2025 01 04 18:19 ከሰዓት", settings);
+    }
+
 
     // ReSharper disable once UnusedMember.Local
     static void DontIgnoreEmptyCollections() =>
@@ -1893,7 +1926,7 @@ public class SerializationTests
         return Verify(target);
     }
 
-#if !NET5_0_OR_GREATER
+#if !NET6_0_OR_GREATER
     [Fact]
     public Task ScrubCodeBaseLocation()
     {
@@ -3274,7 +3307,7 @@ public class SerializationTests
         // using only the member
         VerifierSettings.MemberConverter<MemberTarget, string>(
             expression: _ => _.Field,
-            converter: member => $"{member}_Suffix");
+            converter: _ => $"{_}_Suffix");
 
         // using target and member
         VerifierSettings.MemberConverter<MemberTarget, string>(
@@ -3336,8 +3369,24 @@ public class SerializationTests
         VerifierSettings.ScrubMember<IgnoreExplicitTarget>(_ => _.PropertyThatThrows);
 
         #endregion
+
+        #region ScrubMemberByPredicateGlobal
+
+        VerifierSettings.ScrubMembers(
+            _=>_.DeclaringType == typeof(TargetClass) &&
+               _.Name == "Proprty");
+
+        #endregion
+        #region IgnoreMemberByPredicateGlobal
+
+        VerifierSettings.IgnoreMembers(
+            _=>_.DeclaringType == typeof(TargetClass) &&
+               _.Name == "Proprty");
+
+        #endregion
     }
 
+    class TargetClass;
     #region IgnoreMemberByName
 
     [Fact]
@@ -3446,6 +3495,144 @@ public class SerializationTests
             .ScrubMember<IgnoreExplicitTarget>(_ => _.PropertyThatThrows);
     }
 
+    #endregion
+
+    #region ScrubMemberByPredicate
+
+    [Fact]
+    public Task ScrubMemberByPredicate()
+    {
+        var target = new IgnoreExplicitTarget
+        {
+            Include = "Value",
+            Field = "Value",
+            Property = "Value",
+            PropertyByName = "Value"
+        };
+        var settings = new VerifySettings();
+
+        settings.ScrubMembers(_ => _ is "Field" or "Property");
+        settings.ScrubMembers(_ => _.Name is "PropertyByName" or "PropertyThatThrows");
+
+        return Verify(target, settings);
+    }
+
+    [Fact]
+    public Task ScrubMemberByPredicateFluent()
+    {
+        var target = new IgnoreExplicitTarget
+        {
+            Include = "Value",
+            Field = "Value",
+            Property = "Value",
+            PropertyByName = "Value"
+        };
+        var settings = new VerifySettings();
+
+        return Verify(target, settings)
+            .ScrubMembers(name => name is "Field" or "Property")
+            .ScrubMembers(member => member.Name is "PropertyByName" or "PropertyThatThrows");
+    }
+
+
+    [Fact]
+    public Task ScrubDictionaryByPredicate()
+    {
+        var settings = new VerifySettings();
+
+        settings.ScrubMembers(name => name is "Ignore");
+
+        var target = new Dictionary<string, object>
+        {
+            {
+                "Include", new Dictionary<string, string>
+                {
+                    {
+                        "Ignore", "Value1"
+                    },
+                    {
+                        "Key1", "Value2"
+                    }
+                }
+            },
+            {
+                "Ignore", "Value3"
+            },
+            {
+                "Key2", "Value4"
+            }
+        };
+        return Verify(target, settings);
+    }
+
+    #endregion
+
+    #region IgnoreMemberByPredicate
+
+    [Fact]
+    public Task IgnoreMemberByPredicate()
+    {
+        var target = new IgnoreExplicitTarget
+        {
+            Include = "Value",
+            Field = "Value",
+            Property = "Value",
+            PropertyByName = "Value"
+        };
+        var settings = new VerifySettings();
+
+        settings.IgnoreMembers(_ => _ is "Field" or "Property");
+        settings.IgnoreMembers(_ => _.Name is "PropertyByName" or "PropertyThatThrows");
+
+        return Verify(target, settings);
+    }
+
+    [Fact]
+    public Task IgnoreMemberByPredicateFluent()
+    {
+        var target = new IgnoreExplicitTarget
+        {
+            Include = "Value",
+            Field = "Value",
+            Property = "Value",
+            PropertyByName = "Value"
+        };
+        var settings = new VerifySettings();
+
+        return Verify(target, settings)
+            .IgnoreMembers(_ => _ is "Field" or "Property")
+            .IgnoreMembers(_ => _.Name is "PropertyByName" or "PropertyThatThrows");
+    }
+
+    [Fact]
+    public Task IgnoreDictionaryByPredicate()
+    {
+        var settings = new VerifySettings();
+
+        settings.IgnoreMembers(name => name is "Ignore");
+
+        var target = new Dictionary<string, object>
+        {
+            {
+                "Include", new Dictionary<string, string>
+                {
+                    {
+                        "Ignore", "Value1"
+                    },
+                    {
+                        "Key1", "Value2"
+                    }
+                }
+            },
+            {
+                "Ignore", "Value3"
+            },
+            {
+                "Key2", "Value4"
+            }
+        };
+        return Verify(target, settings);
+    }
     #endregion
 
     public class IgnoreTargetBase

@@ -70,7 +70,7 @@ public static partial class VerifierSettings
         {
             typeof(BigInteger), (target, _) => ((BigInteger) target).ToString(Culture.InvariantCulture)
         },
-#if NET5_0_OR_GREATER
+#if NET6_0_OR_GREATER
         {
             typeof(Half), (target, _) => ((Half) target).ToString(Culture.InvariantCulture)
         },
@@ -140,8 +140,8 @@ public static partial class VerifierSettings
         StrictJson = false;
         scrubProjectDir = true;
         scrubSolutionDir = true;
-        sortPropertiesAlphabetically = false;
-        sortJsonObjects = false;
+        orderPropertiesAlphabetically = false;
+        orderJsonObjects = false;
         scrubUserProfile = true;
         autoVerify = null;
         UniquePrefixDisabled = false;
@@ -183,19 +183,19 @@ public static partial class VerifierSettings
         scrubUserProfile = false;
     }
 
-    internal static bool sortPropertiesAlphabetically;
+    internal static bool orderPropertiesAlphabetically;
 
     public static void SortPropertiesAlphabetically()
     {
         InnerVerifier.ThrowIfVerifyHasBeenRun();
-        sortPropertiesAlphabetically = true;
+        orderPropertiesAlphabetically = true;
     }
 
-    internal static bool sortJsonObjects;
+    internal static bool orderJsonObjects;
 
     public static void SortJsonObjects()
     {
         InnerVerifier.ThrowIfVerifyHasBeenRun();
-        sortJsonObjects = true;
+        orderJsonObjects = true;
     }
 }
